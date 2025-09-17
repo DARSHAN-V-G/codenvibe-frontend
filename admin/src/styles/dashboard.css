@@ -1,0 +1,26 @@
+.dashboard-container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 32px;
+  text-align: center;
+}
+nav {
+  margin-top: 32px;
+}
+.nav-link {
+  display: inline-block;
+  margin: 0 16px;
+  padding: 12px 32px;
+  background: #1976d2;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.nav-link:hover {
+  background: #1565c0;
+}
