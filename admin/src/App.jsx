@@ -6,7 +6,7 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import QuestionsList from './components/Questions/QuestionsList';
 import TeamsList from './components/Teams/TeamsList';
-import LogsPage from './components/Logs/LogsPage';
+import LogsPage from './components/LogsComponents/LogsPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
