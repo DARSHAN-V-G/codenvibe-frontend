@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, Code, Users, BarChart3, Menu, X } from 'lucide-react';
+import { LogOut, Code, Users, BarChart3, Menu, X, Activity } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Layout({ children }) {
@@ -18,6 +18,7 @@ export default function Layout({ children }) {
     { to: '/', icon: BarChart3, label: 'Dashboard' },
     { to: '/questions', icon: Code, label: 'Questions' },
     { to: '/teams', icon: Users, label: 'Teams' },
+    { to: '/logs', icon: Activity, label: 'Server Logs' },
   ];
 
   const NavItem = ({ to, icon: Icon, label, mobile = false }) => (
