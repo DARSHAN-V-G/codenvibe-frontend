@@ -21,20 +21,23 @@ export default function Leaderboard() {
       <nav className="navbar">
         <div className="logo">Vibe n Code</div>
         <div className="buttons">
-          <button>Challenges</button>
-          <button className="active">Leaderboard</button>
+          <button>🧩 Challenges</button>
+          <button className="active">🏆 Leaderboard</button>
           <button>Logout</button>
         </div>
       </nav>
 
-      <h1 className="title">Leaderboard</h1>
+      {/* Title with Trophy */}
+      <div className="title-container">
+        <h1 className="title"> Leaderboard</h1>
+      </div>
       <p className="caption">Top debuggers in the competition</p>
 
       <table className="leaderboard-table">
         <thead>
           <tr>
             <th>Rank</th>
-            <th>Player</th>
+            <th>Team</th>
             <th>Score</th>
             <th>Solved</th>
           </tr>
