@@ -10,6 +10,7 @@ import { FloatingTextBackground } from './components/FloatingTextBackground';
 import { SparkleOverlay } from './components/SparkleOverlay';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
+import Leaderboard from './components/Leaderboard';
 
 // Component to handle navigation logic
 function NavigationWrapper() {
@@ -176,6 +177,12 @@ function AppContent() {
                 </motion.div>
               }
             />
+            <Route 
+            path="/leaderboard"
+            element={
+<Leaderboard />
+            }
+            ></Route>
             <Route
               path="/questions"
               element={
