@@ -1,0 +1,157 @@
+/* General Layout */
+body {
+    background-color: #f9fafb;
+    font-family: 'Patrick Hand', cursive;
+    margin: 0;
+    padding: 0;
+    font-size: 18px; /* ⬆️ base font */
+  }
+  
+  /* Navbar */
+  .navbar {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1.2rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .navbar .logo {
+    font-weight: bold;
+    font-size: 1.6rem;
+  }
+  
+  .navbar .buttons button {
+    background: #f3f4f6;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    margin-left: 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .navbar .buttons button.active {
+    background: black;
+    color: white;
+  }
+  
+  /* Titles */
+  .title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 2rem 0 0.5rem;
+  }
+  
+  .caption {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+  }
+  
+  /* Leaderboard Table */
+  .leaderboard-table {
+    width: 80%;
+    margin: auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid black; /* thin black border for panel */
+  }
+  
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 1.2rem;
+    text-align: left;
+    font-size: 1.2rem;
+  }
+  
+  /* 🔹 Black header row */
+  .leaderboard-table thead tr {
+    background: black;
+    color: white;
+  }
+  
+  .leaderboard-table th {
+    font-weight: 600;
+    font-size: 1.3rem;
+  }
+  
+  /* Highlight Top 3 Rows */
+  .highlight {
+    background: #fff9c4; /* brighter yellow */
+  }
+  
+  /* Score Styling */
+  .score {
+    color: #2563eb;
+    font-weight: bold;
+    font-size: 1.3rem;
+  }
+  
+  /* Solved Pill */
+  .solved-pill {
+    background: #dcfce7;
+    color: #15803d;
+    font-weight: bold;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: 1rem;
+  }
+  
+  /* ✨ Hover Effect with Silver Shine */
+  .leaderboard-table tbody tr {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease-in-out;
+  }
+  
+  /* No background color change */
+  .leaderboard-table tbody tr:hover {
+    transform: scale(1.01);
+    cursor: pointer;
+  }
+  
+  /* Silver Shine Overlay */
+  .leaderboard-table tbody tr::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      transparent,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    );
+    transform: skewX(-20deg);
+  }
+  
+  /* Trigger shine only on hover */
+  .leaderboard-table tbody tr:hover::after {
+    animation: shine 0.75s ease forwards;
+  }
+  
+  /* Shine keyframes */
+  @keyframes shine {
+    0% {
+      left: -75%;
+    }
+    100% {
+      left: 125%;
+    }
+  }
+  
+  /* Special glow for top 3 rows */
+  .leaderboard-table tbody tr.highlight:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4); /* golden glow */
+  }
+  
