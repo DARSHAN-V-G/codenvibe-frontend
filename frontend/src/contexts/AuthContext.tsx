@@ -37,42 +37,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [team, setTeam] = useState<Team | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Clean checkAuthStatus function: since /auth/verify doesn't exist, we'll use localStorage
     const checkAuthStatus = async () => {
         try {
-            console.log('🔍 AuthContext: Checking auth status...');
             setIsLoading(true);
-            
-            // Check localStorage for team data to determine auth status
             const storedTeamData = localStorage.getItem('team');
-            console.log('🔍 AuthContext: Stored team data:', storedTeamData ? 'Found' : 'Not found');
-            
+
             if (storedTeamData) {
                 try {
                     const teamData = JSON.parse(storedTeamData);
                     setTeam(teamData);
                     setIsAuthenticated(true);
-                    console.log('✅ AuthContext: User authenticated with team:', teamData.team_name);
-                } catch (parseError) {
+                   } catch (parseError) {
                     console.error('❌ AuthContext: Failed to parse team data:', parseError);
                     localStorage.removeItem('team');
                     setIsAuthenticated(false);
                     setTeam(null);
                 }
             } else {
-                console.log('ℹ️ AuthContext: No team data found, user not authenticated');
                 setIsAuthenticated(false);
                 setTeam(null);
             }
         } catch (error) {
-            console.error('❌ AuthContext: Error checking auth status:', error);
             setIsAuthenticated(false);
             setTeam(null);
             localStorage.removeItem('team');
         } finally {
             setIsLoading(false);
-            console.log('🏁 AuthContext: Auth check completed');
-        }
+            }
     };
 
     // Check authentication status on mount
@@ -107,6 +98,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 setIsAuthenticated(true);
                 setTeam(response.team);
                 localStorage.setItem('team', JSON.stringify(response.team));
+                // Store year separately for WebSocket context
+                if (response.team.year) {
+                    localStorage.setItem('year', response.team.year.toString());
+                    }
                 toast.success(`Welcome, ${response.team.team_name}!`);
             }
             

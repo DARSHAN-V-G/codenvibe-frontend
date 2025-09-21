@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { WebSocketProvider } from './contexts/WebSocketContext';
 import { LoginPage } from './components/LoginPage';
 import { QuestionListPage } from './components/QuestionListPage';
 import { CodeEditorPage } from './components/CodeEditorPage';
@@ -74,17 +75,13 @@ function LoginWithRouter() {
 
   // Watch for authentication changes and redirect
   useEffect(() => {
-    console.log('LoginWithRouter: isAuthenticated =', isAuthenticated, 'isLoading =', isLoading);
     if (isAuthenticated && !isLoading) {
-      console.log('Redirecting to /questions...');
-      // Use a short delay to ensure all state updates are complete
       setTimeout(() => {
         navigate('/questions', { replace: true });
       }, 50);
     }
   }, [isAuthenticated, isLoading, navigate]);
 
-  // Simplified callback - no logic needed here
   const handleLogin = () => {
     console.log('Login callback called - auth state will handle redirect');
   };
@@ -217,31 +214,33 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#4ade80',
-              secondary: '#fff',
+      <WebSocketProvider>
+        <AppContent />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
             },
-          },
-          error: {
-            duration: 5000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#4ade80',
+                secondary: '#fff',
+              },
             },
-          },
-        }}
-      />
+            error: {
+              duration: 5000,
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
+      </WebSocketProvider>
     </AuthProvider>
   );
 }

@@ -1,144 +1,31 @@
-import { useState, useEffect, useRef } from 'react';
-import { leaderboardApi, setupWebSocket, LeaderboardEntry } from '../api';
+import { useState } from 'react';
+import { LeaderboardEntry } from '../api';
 import { useAuth } from '../contexts/AuthContext';
-import toast from 'react-hot-toast';
+import { useWebSocket } from '../contexts/WebSocketContext';
 import "./Leaderboard.css";
 
 export default function Leaderboard() {
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<string>('');
-  const [isConnected, setIsConnected] = useState(false);
   const { team, isAuthenticated } = useAuth();
-  const wsRef = useRef<WebSocket | null>(null);
+  const { isConnected, lastUpdate, leaderboardData } = useWebSocket();
 
   // Get current user's team data for highlighting
   const currentTeamName = team?.team_name;
 
-  const getMedal = (rank: number): string | number => {
+  const getMedal = (rank: number | undefined): string | number => {
+    if (!rank) return "-";
     if (rank === 1) return "🥇";
     if (rank === 2) return "🥈";
     if (rank === 3) return "🥉";
     return rank;
   };
 
-  // Fetch initial leaderboard data
-  const fetchLeaderboard = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      let response;
-      if (team?.year) {
-        response = await leaderboardApi.getLeaderboardByYear(team.year);
-      } else {
-        response = await leaderboardApi.getLeaderboard();
-      }
-      
-      setLeaderboardData(response.leaderboard);
-      setLastUpdated(new Date(response.timestamp).toLocaleTimeString());
-      console.log('✅ Leaderboard loaded:', response.leaderboard.length, 'teams');
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load leaderboard';
-      setError(errorMessage);
-      console.error('❌ Leaderboard fetch failed:', err);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle WebSocket score updates
-  const handleScoreUpdate = (data: any) => {
-    console.log('📊 WebSocket leaderboard update received:', data);
-    
-    try {
-      // Update leaderboard data if it's a leaderboard update
-      if (data.type === 'leaderboard_update' && data.leaderboard) {
-        setLeaderboardData(data.leaderboard);
-        setLastUpdated(new Date().toLocaleTimeString());
-        
-        // Show notification for score updates
-        if (data.updated_team && currentTeamName === data.updated_team) {
-          toast.success(`Your team's score has been updated!`);
-        }
-      }
-      // Handle individual score updates
-      else if (data.type === 'score_update' && data.team_name && data.new_score) {
-        setLeaderboardData(prev => 
-          prev.map(entry => 
-            entry.team_name === data.team_name 
-              ? { ...entry, score: data.new_score, solved: data.solved || entry.solved }
-              : entry
-          ).sort((a, b) => b.score - a.score) // Re-sort by score
-           .map((entry, index) => ({ ...entry, rank: index + 1 })) // Update ranks
-        );
-        setLastUpdated(new Date().toLocaleTimeString());
-        
-        if (currentTeamName === data.team_name) {
-          toast.success(`Score updated: ${data.new_score} points!`);
-        }
-      }
-    } catch (err) {
-      console.error('❌ Error processing WebSocket update:', err);
-    }
-  };
-
-  // Setup WebSocket connection
-  const setupWebSocketConnection = () => {
-    try {
-      console.log('🔌 Setting up WebSocket connection for leaderboard...');
-      const ws = setupWebSocket(handleScoreUpdate);
-      
-      ws.onopen = () => {
-        console.log('✅ WebSocket connected for leaderboard updates');
-        setIsConnected(true);
-        toast.success('Real-time updates connected!');
-      };
-      
-      ws.onclose = () => {
-        console.log('🔌 WebSocket disconnected');
-        setIsConnected(false);
-        // Attempt to reconnect after 5 seconds
-        setTimeout(() => {
-          if (wsRef.current?.readyState === WebSocket.CLOSED) {
-            setupWebSocketConnection();
-          }
-        }, 5000);
-      };
-      
-      ws.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
-        setIsConnected(false);
-      };
-      
-      wsRef.current = ws;
-    } catch (error) {
-      console.error('❌ Failed to setup WebSocket:', error);
-      toast.error('Failed to connect real-time updates');
-    }
-  };
-
-  // Initialize component
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchLeaderboard();
-      setupWebSocketConnection();
-    }
-
-    // Cleanup WebSocket on unmount
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-    };
-  }, [isAuthenticated, team?.year]);
-
-  // Refresh leaderboard manually
+  // Handle refresh button click
   const handleRefresh = () => {
-    fetchLeaderboard();
+    window.location.reload();
   };
+
+
 
   if (!isAuthenticated) {
     return (
@@ -151,7 +38,7 @@ export default function Leaderboard() {
     );
   }
 
-  if (loading) {
+  if (!leaderboardData || leaderboardData.length === 0) {
     return (
       <div className="leaderboard-container">
         <div className="title-container">
@@ -219,7 +106,7 @@ export default function Leaderboard() {
         }}>
           {isConnected ? '🟢 Live Updates' : '🔴 Disconnected'}
         </span>
-        {lastUpdated && <span>Last updated: {lastUpdated}</span>}
+        {lastUpdate && <span>Last updated: {lastUpdate}</span>}
         <button 
           onClick={handleRefresh}
           style={{

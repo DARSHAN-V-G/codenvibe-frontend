@@ -13,32 +13,14 @@ const apiClient = axios.create({
 
 // Request interceptor for logging
 apiClient.interceptors.request.use((config) => {
-    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-        baseURL: config.baseURL,
-        data: config.data,
-        headers: config.headers,
-        withCredentials: config.withCredentials,
-    });
 
-    // Log cookies being sent (for debugging - this shows all cookies for the domain)
+
     if (typeof document !== 'undefined') {
-        console.log('🍪 Current cookies:', document.cookie);
 
-        // Specifically check for our auth cookie
         const cookies = document.cookie.split(';').map(c => c.trim());
         const authCookie = cookies.find(c => c.startsWith('codenvibe_token='));
-        if (authCookie) {
-            console.log('✅ codenvibe_token found and will be sent:', authCookie.substring(0, 30) + '...');
-        } else {
-            console.log('❌ codenvibe_token NOT found in cookies!');
-        }
 
-        // Check if withCredentials is properly set
-        if (config.withCredentials) {
-            console.log('✅ withCredentials is TRUE - cookies will be sent');
-        } else {
-            console.log('❌ withCredentials is FALSE - cookies will NOT be sent');
-        }
+        // Check withCredentials status silently
     }
 
     return config;
@@ -47,59 +29,18 @@ apiClient.interceptors.request.use((config) => {
 // Response interceptor to handle errors and logging
 apiClient.interceptors.response.use(
     (response) => {
-        console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-            status: response.status,
-            data: response.data,
-            headers: response.headers,
-        });
 
-        // Log Set-Cookie headers for debugging
-        const setCookieHeader = response.headers['set-cookie'];
-        if (setCookieHeader) {
-            console.log('🍪 Set-Cookie headers received:', setCookieHeader);
-        }
 
-        // Enhanced cookie debugging for login responses
+        // Enhanced cookie handling for login responses
         if (response.config.url?.includes('login') || response.config.url?.includes('verify')) {
-            console.log('🔍 Enhanced cookie debugging for auth response:');
-            console.log('- Response headers:', response.headers);
-            console.log('- All cookies after response:', document.cookie);
-
-            // Check specifically for our token
-            const cookies = document.cookie.split(';').map(c => c.trim());
-            const tokenCookie = cookies.find(c => c.startsWith('codenvibe_token='));
-            console.log('- Our token cookie:', tokenCookie || 'NOT FOUND');
+            document.cookie.split(';').map(c => c.trim());
         }
 
         return response;
     },
     (error) => {
-        console.error(`❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-            status: error.response?.status,
-            statusText: error.response?.statusText,
-            data: error.response?.data,
-            message: error.message,
-            headers: error.response?.headers,
-        });
 
         if (error.response?.status === 401) {
-            console.log('🔒 Authentication expired - codenvibe_token cookie may be invalid or missing');
-
-            // Enhanced 401 debugging
-            console.log('🔍 401 Error Analysis:', {
-                frontendOrigin: window.location.origin,
-                backendURL: error.config?.baseURL || 'unknown',
-                withCredentials: error.config?.withCredentials,
-                cookiesPresent: document.cookie.includes('codenvibe_token'),
-                allCookies: document.cookie,
-                possibleIssues: [
-                    'Backend CORS not configured to accept credentials from this origin',
-                    'Cookie domain/path mismatch',
-                    'Token expired or invalid',
-                    'Backend not reading codenvibe_token cookie correctly'
-                ]
-            });
-
             // Cookie expired or invalid - the browser will handle cookie removal
         }
         return Promise.reject(error);
@@ -113,6 +54,7 @@ export interface AuthResponse {
         team_name: string;
         roll_nos: string[];
         emails: string[];
+        year: number;
     };
 }
 
@@ -188,9 +130,10 @@ export interface LeaderboardEntry {
     _id: string;
     team_name: string;
     score: number;
-    solved: number;
-    rank: number;
+    testcases_passed: number[];
     year: number;
+    solved?: number;
+    rank?: number;
 }
 
 export interface LeaderboardResponse {
@@ -221,11 +164,7 @@ export const authApi = {
                 otp,
             });
 
-            // After successful login, check if cookie was set
-            setTimeout(() => {
-                const cookieCheck = checkAuthCookie();
-                console.log('🍪 Post-login cookie check:', cookieCheck);
-            }, 100);
+            // Cookie check handled silently
 
             return response.data;
         } catch (error: any) {
@@ -247,16 +186,10 @@ export const questionApi = {
     // Get all questions for user's year
     getQuestions: async (): Promise<QuestionListItem[]> => {
         try {
-            console.log('📚 Making question API request...');
             const response: AxiosResponse<QuestionListItem[]> = await apiClient.get('/question/getQuestion');
-            console.log('✅ Questions fetched successfully:', response.data);
             return response.data;
         } catch (error: any) {
-            console.error('❌ Question fetch failed:', error.response?.data);
-
-            if (error.response?.status === 401) {
-                console.log('🔒 Authentication failed during question fetch');
-            }
+            // Handle error silently
 
             throw new Error(error.response?.data?.message || error.response?.data?.error || 'Failed to fetch questions');
         }
@@ -265,18 +198,7 @@ export const questionApi = {
     // Get specific question by ID
     getQuestionById: async (id: string): Promise<Question> => {
         try {
-            console.log('🔍 API: Fetching question by ID:', id);
-            console.log('🔍 API: Full URL will be:', `${API_BASE_URL}/question/question/${id}`);
-            
             const response: AxiosResponse<Question> = await apiClient.get(`/question/question/${id}`);
-            
-            console.log('✅ API: Question response received:', {
-                status: response.status,
-                dataKeys: Object.keys(response.data || {}),
-                hasDescription: !!(response.data as any)?.description,
-                hasTitle: !!(response.data as any)?.title,
-                fullData: response.data
-            });
             
             // Check if the data is nested in a wrapper object
             let questionData = response.data;
@@ -285,37 +207,20 @@ export const questionApi = {
             if (questionData && typeof questionData === 'object') {
                 // Check if data is wrapped in a 'question' property
                 if ((questionData as any).question && !(questionData as any).title) {
-                    console.log('🔄 API: Data appears to be wrapped in "question" property');
                     questionData = (questionData as any).question;
                 }
                 // Check if data is wrapped in a 'data' property
                 else if ((questionData as any).data && !(questionData as any).title) {
-                    console.log('🔄 API: Data appears to be wrapped in "data" property');
                     questionData = (questionData as any).data;
                 }
                 // Check if it's an array and we need the first element
                 else if (Array.isArray(questionData) && questionData.length > 0) {
-                    console.log('🔄 API: Data appears to be an array, taking first element');
                     questionData = questionData[0];
                 }
             }
             
-            console.log('🏁 API: Final question data:', {
-                hasTitle: !!(questionData as any)?.title,
-                hasDescription: !!(questionData as any)?.description,
-                keys: Object.keys(questionData || {})
-            });
-            
             return questionData as Question;
         } catch (error: any) {
-            console.error('❌ API: getQuestionById failed:', {
-                id,
-                status: error.response?.status,
-                statusText: error.response?.statusText,
-                errorData: error.response?.data,
-                url: error.config?.url,
-                baseURL: error.config?.baseURL
-            });
             throw new Error(error.response?.data?.error || error.response?.data?.message || 'Failed to fetch question');
         }
     },
@@ -323,7 +228,7 @@ export const questionApi = {
     // Get submission logs for a specific question
     getQuestionLogs: async (id: string): Promise<QuestionLogsResponse> => {
         try {
-            const response: AxiosResponse<QuestionLogsResponse> = await apiClient.get(`/questions/${id}/logs`);
+            const response: AxiosResponse<QuestionLogsResponse> = await apiClient.get(`/question/logs/${id}`);
             return response.data;
         } catch (error: any) {
             throw new Error(error.response?.data?.error || 'Failed to fetch question logs');
@@ -397,33 +302,41 @@ export const submissionApi = {
     },
 };
 
-// Leaderboard API
-export const leaderboardApi = {
-    // Get current leaderboard
-    getLeaderboard: async (): Promise<LeaderboardResponse> => {
-        try {
-            console.log('📊 Fetching leaderboard data...');
-            const response: AxiosResponse<LeaderboardResponse> = await apiClient.get('/leaderboard');
-            console.log('✅ Leaderboard data fetched:', response.data);
-            return response.data;
-        } catch (error: any) {
-            console.error('❌ Leaderboard fetch failed:', error.response?.data);
-            throw new Error(error.response?.data?.error || error.response?.data?.message || 'Failed to fetch leaderboard');
-        }
-    },
+// WebSocket setup for real-time leaderboard updates
+export const setupLeaderboardWebSocket = (onUpdate: (data: LeaderboardEntry[]) => void) => {
+    const wsUrl = API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://');
+    const ws = new WebSocket(wsUrl);
 
-    // Get leaderboard for specific year
-    getLeaderboardByYear: async (year: number): Promise<LeaderboardResponse> => {
+    ws.onopen = () => {};
+
+    ws.onmessage = (event) => {
         try {
-            console.log('📊 Fetching leaderboard data for year:', year);
-            const response: AxiosResponse<LeaderboardResponse> = await apiClient.get(`/leaderboard/${year}`);
-            console.log('✅ Leaderboard data fetched for year:', year, response.data);
-            return response.data;
-        } catch (error: any) {
-            console.error('❌ Leaderboard fetch failed for year:', year, error.response?.data);
-            throw new Error(error.response?.data?.error || error.response?.data?.message || 'Failed to fetch leaderboard');
+            const message = JSON.parse(event.data);
+
+            if (message.type === 'scores' && Array.isArray(message.teams)) {
+                // Transform the data to match our LeaderboardEntry interface
+                const leaderboardData = message.teams.map((team: any) => ({
+                    _id: team._id || '',
+                    team_name: team.team_name,
+                    score: team.score || 0,
+                    testcases_passed: team.testcases_passed || [],
+                    year: team.year || 0,
+                    // Calculate solved count if testcases_passed exists
+                    solved: team.testcases_passed ? 
+                        team.testcases_passed.filter((score: number) => score >= 8).length : 0
+                }));
+                onUpdate(leaderboardData);
+            }
+        } catch (error) {
+            // Handle error silently
         }
-    },
+    };
+
+    ws.onclose = () => {};
+
+    ws.onerror = () => {};
+
+    return ws;
 };
 
 // Admin API
@@ -504,28 +417,22 @@ export const setupWebSocket = (onScoreUpdate: (scores: any) => void) => {
     const wsUrl = API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://');
     const ws = new WebSocket(wsUrl);
 
-    ws.onopen = () => {
-        console.log('🔌 WebSocket connected to:', wsUrl);
-    };
+    ws.onopen = () => {};
 
     ws.onmessage = (event) => {
         try {
             const data = JSON.parse(event.data);
-            console.log('📊 WebSocket message received:', data);
             onScoreUpdate(data);
         } catch (error) {
-            console.error('❌ Error parsing WebSocket message:', error);
+            // Handle error silently
         }
     };
 
     ws.onclose = () => {
-        console.log('🔌 WebSocket disconnected');
         // Optionally implement reconnection logic
     };
 
-    ws.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
-    };
+    ws.onerror = () => {};
 
     return ws;
 };
@@ -535,23 +442,10 @@ export { API_BASE_URL, apiClient };
 
 // Debug function to test cookie transmission
 export const debugCookieTransmission = async () => {
-    console.log('🧪 Starting Cookie Transmission Debug Test');
-
-    // Check current cookies
-    console.log('📋 Current cookies:', document.cookie);
-
-    // Check if our token exists
-    const hasToken = document.cookie.includes('codenvibe_token');
-    console.log('🎯 codenvibe_token exists:', hasToken);
-
-    // Try a simple GET request to test cookie transmission
     try {
-        console.log('🚀 Making test request to /api/questions...');
         const response = await apiClient.get('/api/questions');
-        console.log('✅ Test request successful:', response.data);
         return { success: true, data: response.data };
     } catch (error: any) {
-        console.log('❌ Test request failed:', error.response?.status, error.response?.data);
         return { success: false, error: error.response?.data };
     }
 };
@@ -564,14 +458,6 @@ export const checkAuthCookie = (): { exists: boolean; value?: string; allCookies
     const allCookies = document.cookie;
     const cookies = allCookies.split(';');
     const authCookie = cookies.find(cookie => cookie.trim().startsWith('codenvibe_token='));
-
-    console.log('🍪 Enhanced cookie check:', {
-        found: !!authCookie,
-        allCookies: allCookies || 'NO COOKIES',
-        authCookie: authCookie?.trim() || 'NOT FOUND',
-        cookieCount: cookies.length,
-        url: window.location.origin
-    });
 
     if (authCookie) {
         const tokenValue = authCookie.split('=')[1]?.trim();

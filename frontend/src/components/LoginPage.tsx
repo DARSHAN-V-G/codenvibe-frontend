@@ -22,29 +22,23 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       return;
     }
 
-    console.log('🔐 LoginPage: Starting OTP request process for email:', email);
     setIsLoading(true);
     clearError();
 
     try {
-      console.log('📧 LoginPage: Requesting OTP for email:', email);
       const response = await requestOTP(email);
-      console.log('📧 LoginPage: OTP request response:', response);
-
+      
       if (response.success) {
         setOtpSent(true);
-        console.log('✅ LoginPage: OTP sent successfully, showing OTP input field');
-        // Toast is already shown in AuthContext
+        
       } else {
-        console.log('❌ LoginPage: OTP request failed:', response.message);
-        // Toast is already shown in AuthContext
+        
       }
     } catch (err) {
       console.error('❌ LoginPage: Failed to send OTP:', err);
       // Toast is already shown in AuthContext
     } finally {
       setIsLoading(false);
-      console.log('📧 LoginPage: OTP request process completed');
     }
   };
 
@@ -54,30 +48,24 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       return;
     }
 
-    console.log('🔐 LoginPage: Starting login process with email:', email, 'and OTP length:', otp.length);
     setIsLoading(true);
     clearError();
 
     try {
-      console.log('🔐 LoginPage: Attempting login with email:', email, 'and OTP:', otp);
       const response = await login(email, otp);
-      console.log('🔐 LoginPage: Login response received:', response);
-
+      if (response.team?.year) {
+          localStorage.setItem('year', response.team.year.toString());
+          }
       if (response.success && response.team) {
-        console.log('✅ LoginPage: Login successful! Team:', response.team.team_name);
-        console.log('✅ LoginPage: Calling onLogin callback to redirect user');
         onLogin();
       } else {
-        console.log('❌ LoginPage: Login failed - response.success is false or no team data');
-        // Toast is already shown in AuthContext
+        
       }
     } catch (err) {
-      console.error('❌ LoginPage: Login error:', err);
-      // Toast is already shown in AuthContext
+      
     } finally {
       setIsLoading(false);
-      console.log('🔐 LoginPage: Login process completed');
-    }
+      }
   };
 
   return (

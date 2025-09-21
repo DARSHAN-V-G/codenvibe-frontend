@@ -129,7 +129,6 @@ function QuestionCard({ question, onEdit, onDelete }) {
       setCheckingQuestion(true);
       setCheckResult(null);
       const result = await api.checkQuestion(question._id);
-      console.log('Check result:', result);
       setCheckResult(result);
     } catch (error) {
       console.error('Error checking question:', error);

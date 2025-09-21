@@ -31,7 +31,6 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
         completed: false
       }));
       setQuestions(questionsWithDefaults);
-      console.log(`Loaded ${questionsData.length} questions`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       setError(errorMessage);
