@@ -15,6 +15,7 @@ interface QuestionListPageProps {
 }
 
 export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
+
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,11 +26,11 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
       setLoading(true);
       setError(null);
       const questionsData = await questionApi.getQuestions();
-      const questionsWithCompleted = questionsData.map(q => ({
+      const questionsWithDefaults = questionsData.map(q => ({
         ...q,
-        completed: false // Set default completed status to false for new questions
+        completed: false
       }));
-      setQuestions(questionsWithCompleted);
+      setQuestions(questionsWithDefaults);
       console.log(`Loaded ${questionsData.length} questions`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -74,44 +75,64 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fb', fontFamily: 'Comic Neue, sans-serif' }}>
-      {/* Navbar */}
-      
+    <div className="min-h-screen bg-white p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-6xl font-bold text-black mb-4 font-main">
+            Debugging Challenges
+          </h1>
+          <p className="text-xl text-gray-600 font-main">
+            Choose a challenge and start debugging!
+          </p>
+        </div>
 
-      {/* Header */}
-      <section style={styles.section}>
-        <h1 style={styles.pageTitle}>Debugging Challenges</h1>
-        <p style={styles.subtitle}>Choose a challenge and start debugging!</p>
-
-        <div style={styles.grid}>
+        {/* Challenge Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {questions.map((question) => (
             <div
               key={question._id}
-              style={{
-                ...styles.card,
-                ...(question.completed ? styles.completedCard : {}),
-              }}
-              onClick={() => onSelectQuestion(question._id)}
+              className="bg-white rounded-xl border-2 border-black p-6 shadow-lg hover:shadow-xl transition-shadow relative"
             >
-              {question.completed && <span style={styles.tick}>✔</span>}
-              <h2 style={styles.cardTitle}>{question.title}</h2>
-              <p style={styles.cardText}>{question.description}</p>
-              <button style={styles.cardButton}>
+              {question.completed && (
+                <div className="absolute top-4 right-4">
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm">✓</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="mb-4">
+                <h3 className="text-2xl font-bold text-black mb-2 font-main">
+                  {question.title}
+                </h3>
+              </div>
+
+              <p className="text-gray-700 mb-6 leading-relaxed font-main">
+                {question.description}
+              </p>
+
+              <Button
+                onClick={() => onSelectQuestion(question._id)}
+                className="w-full py-3 px-6 border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition-colors font-main"
+              >
                 {question.completed ? 'View Solution' : 'Start Challenge'}
-              </button>
+              </Button>
             </div>
           ))}
         </div>
 
         {questions.length === 0 && (
-          <div style={styles.emptyState}>
-            <div style={styles.errorBox}>
-              <h3 style={styles.errorTitle}>No challenges available</h3>
-              <p style={styles.errorText}>Check back later for new debugging challenges.</p>
+          <div className="text-center py-12">
+            <div className="bg-white p-8 rounded-xl border-2 border-black shadow-lg max-w-md mx-auto">
+              <h3 className="text-2xl font-bold mb-2 font-main">No challenges available</h3>
+              <p className="text-gray-600 font-main">
+                Check back later for new debugging challenges.
+              </p>
             </div>
           </div>
         )}
-      </section>
+      </div>
     </div>
   );
 }
@@ -146,119 +167,4 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#666',
     marginBottom: '1rem',
   },
-  navbar: {
-    width: '100%',
-    backgroundColor: '#fff',
-    borderBottom: '2px solid #000',
-    padding: '0.75rem 0',
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-  },
-  navbarInner: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '0 2rem',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  navLeft: {
-    fontSize: '1.3rem',
-    fontWeight: 700,
-    color: '#000',
-  },
-  navLinks: {
-    display: 'flex',
-    gap: '1rem',
-  },
-  navButton: {
-    backgroundColor: 'transparent',
-    border: '1px solid #000',
-    color: '#000',
-    padding: '0.4rem 0.9rem',
-    borderRadius: '6px',
-    fontSize: '0.85rem',
-    fontWeight: 700,
-    cursor: 'pointer',
-  },
-  activeButton: {
-    backgroundColor: '#000',
-    color: '#fff',
-  },
-  divider: {
-    border: 'none',
-    borderTop: '2px solid #000',
-    margin: 0,
-  },
-  section: {
-    padding: '2rem 0',
-    textAlign: 'center',
-  },
-  pageTitle: {
-    fontSize: '1.8rem',
-    fontWeight: 700,
-    marginBottom: '0.4rem',
-    color: '#000',
-  },
-  subtitle: {
-    fontSize: '0.9rem',
-    color: '#444',
-    marginBottom: '1.5rem',
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '1.5rem',
-    padding: '0 2rem',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: '10px',
-    padding: '1rem 1.25rem',
-    border: '1px solid #000',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-    position: 'relative',
-    transition: 'box-shadow 0.2s ease',
-  },
-  completedCard: {
-    border: '2px solid #28a745',
-    backgroundColor: '#f0fff4',
-  },
-  tick: {
-    position: 'absolute',
-    top: '10px',
-    right: '10px',
-    fontSize: '1.2rem',
-    color: '#28a745',
-    backgroundColor: '#e6f4ea',
-    borderRadius: '50%',
-    padding: '0.3rem 0.5rem',
-    fontWeight: 'bold',
-  },
-  cardTitle: {
-    fontSize: '1.2rem',
-    fontWeight: 700,
-    marginBottom: '0.4rem',
-  },
-  cardText: {
-    fontSize: '0.9rem',
-    color: '#444',
-    marginBottom: '1rem',
-  },
-  cardButton: {
-    backgroundColor: '#000',
-    color: '#fff',
-    border: 'none',
-    padding: '0.6rem 2rem',
-    borderRadius: '8px',
-    fontSize: '0.9rem',
-    fontWeight: 700,
-    cursor: 'pointer',
-  },
-  emptyState: {
-    textAlign: 'center',
-    padding: '4rem 2rem',
-  },
 };
-//*test//
