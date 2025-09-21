@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authApi, AuthResponse, checkAuthCookie } from '../api';
+import { authApi, AuthResponse } from '../api';
 import toast from 'react-hot-toast';
 
 // Types
@@ -35,22 +35,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [team, setTeam] = useState<Team | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Simplified authentication check - just check cookie and sessionStorage
+    // Check authentication status with backend verification
     const checkAuthStatus = async () => {
         try {
             console.log('🔍 AuthContext: Checking authentication status...');
             setIsLoading(true);
 
-            // Check if cookie exists
-            const cookieCheck = checkAuthCookie();
-            console.log('🍪 AuthContext: Cookie check result:', cookieCheck);
-
-            if (!cookieCheck.exists) {
-                console.log('🔍 AuthContext: No codenvibe_token cookie found - user not authenticated');
-                setIsAuthenticated(false);
-                setTeam(null);
-                localStorage.removeItem('team');
-                return;
+            try {
+                // Verify token with backend
+                const response = await authApi.verifyAuth();
+                if (response.authenticated) {
+                    console.log('✅ AuthContext: Token verified with backend');
+                    setIsAuthenticated(true);
+                    if (response.team) {
+                        setTeam(response.team);
+                        localStorage.setItem('team', JSON.stringify(response.team));
+                    }
+                    return;
+                }
+            } catch (error) {
+                console.log('❌ AuthContext: Token verification failed:', error);
             }
 
             // Cookie exists - assume user is authenticated (skip API verification)
@@ -115,18 +119,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             const response = await authApi.verifyOTP(email, otp);
             console.log('✅ AuthContext: API response:', response);
 
-            // Immediately check if cookie was set by the backend
-            setTimeout(() => {
-                const postLoginCookieCheck = checkAuthCookie();
-                console.log('🍪 AuthContext: Cookie check immediately after login:', postLoginCookieCheck);
-
-                if (!postLoginCookieCheck.exists) {
-                    console.error('❌ AuthContext: CRITICAL - Cookie was NOT set by backend after successful login!');
-                    console.log('🔍 AuthContext: This means your backend cookie settings might be wrong');
-                } else {
-                    console.log('✅ AuthContext: Cookie successfully set by backend');
+            // Set auth state immediately after successful login
+            if (response.success) {
+                setIsAuthenticated(true);
+                if (response.team) {
+                    setTeam(response.team);
+                    localStorage.setItem('team', JSON.stringify(response.team));
                 }
-            }, 100);
+                // No need to check for cookie immediately as it's handled by the backend
+                console.log('✅ AuthContext: Login successful, auth state updated');
+            }
 
             if (response.success && response.team) {
                 console.log('✅ AuthContext: Login successful, updating state...');

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
+import { Button } from './ui/button';
 import { questionApi } from '@/api';
-import { useAuthContext } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Question {
   _id: string;
@@ -18,14 +18,18 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { isAuthenticated, isLoading: authLoading } = useAuthContext();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   const fetchQuestions = async () => {
     try {
       setLoading(true);
       setError(null);
       const questionsData = await questionApi.getQuestions();
-      setQuestions(questionsData);
+      const questionsWithCompleted = questionsData.map(q => ({
+        ...q,
+        completed: false // Set default completed status to false for new questions
+      }));
+      setQuestions(questionsWithCompleted);
       console.log(`Loaded ${questionsData.length} questions`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -72,18 +76,7 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fb', fontFamily: 'Comic Neue, sans-serif' }}>
       {/* Navbar */}
-      <nav style={styles.navbar}>
-        <div style={styles.navbarInner}>
-          <div style={styles.navLeft}>Vibe n Code</div>
-          <div style={styles.navLinks}>
-            <button style={{ ...styles.navButton, ...styles.activeButton }}>Challenges</button>
-            <button style={styles.navButton}>Leaderboard</button>
-            <button style={styles.navButton}>Logout</button>
-          </div>
-        </div>
-      </nav>
-
-      <hr style={styles.divider} />
+      
 
       {/* Header */}
       <section style={styles.section}>

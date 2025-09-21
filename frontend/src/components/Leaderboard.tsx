@@ -9,7 +9,7 @@ export default function Leaderboard() {
     { id: 5, name: "BitLord", score: 2231, solved: 8 },
   ];
 
-  const getMedal = (rank) => {
+  const getMedal = (rank: number): string | number => {
     if (rank === 1) return "🥇";
     if (rank === 2) return "🥈";
     if (rank === 3) return "🥉";
@@ -18,14 +18,6 @@ export default function Leaderboard() {
 
   return (
     <div className="leaderboard-container">
-      <nav className="navbar">
-        <div className="logo">Vibe n Code</div>
-        <div className="buttons">
-          <button>🧩 Challenges</button>
-          <button className="active">🏆 Leaderboard</button>
-          <button>Logout</button>
-        </div>
-      </nav>
 
       {/* Title with Trophy */}
       <div className="title-container">
