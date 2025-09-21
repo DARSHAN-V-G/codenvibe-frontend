@@ -1,90 +1,77 @@
+
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authApi, AuthResponse } from '../api';
 import toast from 'react-hot-toast';
 
 // Types
-interface Team {
+export type Team = {
+    team_id?: string;
     team_name: string;
-    roll_nos: string[];
-    emails: string[];
-}
+    roll_nos?: string[];
+    emails?: string[];
+    year?: number;
+    // Add other team properties as needed
+};
 
-interface AuthContextType {
+export type AuthContextType = {
     isAuthenticated: boolean;
     isLoading: boolean;
     team: Team | null;
+    error: string | null;
     login: (email: string, otp: string) => Promise<AuthResponse>;
     requestOTP: (email: string) => Promise<AuthResponse>;
-    logout: () => void;
-    error: string | null;
     clearError: () => void;
     checkAuthStatus: () => Promise<void>;
-}
+};
 
-// Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider component
-interface AuthProviderProps {
+type AuthProviderProps = {
     children: ReactNode;
-}
+};
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // Start with true to prevent flash of unauthenticated state
     const [team, setTeam] = useState<Team | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Check authentication status with backend verification
+    // Clean checkAuthStatus function: since /auth/verify doesn't exist, we'll use localStorage
     const checkAuthStatus = async () => {
         try {
-            console.log('🔍 AuthContext: Checking authentication status...');
+            console.log('🔍 AuthContext: Checking auth status...');
             setIsLoading(true);
-
-            try {
-                // Verify token with backend
-                const response = await authApi.verifyAuth();
-                if (response.authenticated) {
-                    console.log('✅ AuthContext: Token verified with backend');
-                    setIsAuthenticated(true);
-                    if (response.team) {
-                        setTeam(response.team);
-                        localStorage.setItem('team', JSON.stringify(response.team));
-                    }
-                    return;
-                }
-            } catch (error) {
-                console.log('❌ AuthContext: Token verification failed:', error);
-            }
-
-            // Cookie exists - assume user is authenticated (skip API verification)
-            console.log('✅ AuthContext: Cookie found - assuming user is authenticated');
-            setIsAuthenticated(true);
-
-            // Try to restore team info from localStorage
+            
+            // Check localStorage for team data to determine auth status
             const storedTeamData = localStorage.getItem('team');
+            console.log('🔍 AuthContext: Stored team data:', storedTeamData ? 'Found' : 'Not found');
+            
             if (storedTeamData) {
                 try {
                     const teamData = JSON.parse(storedTeamData);
                     setTeam(teamData);
-                    console.log('🔄 AuthContext: Restored team data from localStorage:', teamData);
+                    setIsAuthenticated(true);
+                    console.log('✅ AuthContext: User authenticated with team:', teamData.team_name);
                 } catch (parseError) {
-                    console.error('❌ AuthContext: Failed to parse stored team data:', parseError);
+                    console.error('❌ AuthContext: Failed to parse team data:', parseError);
                     localStorage.removeItem('team');
+                    setIsAuthenticated(false);
                     setTeam(null);
                 }
             } else {
-                console.log('⚠️ AuthContext: No team data in localStorage - user authenticated but team info missing');
+                console.log('ℹ️ AuthContext: No team data found, user not authenticated');
+                setIsAuthenticated(false);
                 setTeam(null);
             }
-
-        } catch (error: any) {
-            console.error('❌ AuthContext: Error during auth check:', error);
+        } catch (error) {
+            console.error('❌ AuthContext: Error checking auth status:', error);
             setIsAuthenticated(false);
             setTeam(null);
             localStorage.removeItem('team');
         } finally {
             setIsLoading(false);
+            console.log('🏁 AuthContext: Auth check completed');
         }
     };
 
@@ -114,60 +101,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         try {
             setError(null);
             setIsLoading(true);
-
-            console.log('🔐 AuthContext: Calling verifyOTP API...');
             const response = await authApi.verifyOTP(email, otp);
-            console.log('✅ AuthContext: API response:', response);
-
-            // Set auth state immediately after successful login
-            if (response.success) {
-                setIsAuthenticated(true);
-                if (response.team) {
-                    setTeam(response.team);
-                    localStorage.setItem('team', JSON.stringify(response.team));
-                }
-                // No need to check for cookie immediately as it's handled by the backend
-                console.log('✅ AuthContext: Login successful, auth state updated');
-            }
-
+            
             if (response.success && response.team) {
-                console.log('✅ AuthContext: Login successful, updating state...');
                 setIsAuthenticated(true);
                 setTeam(response.team);
-
-                // Store team data in localStorage for persistence across tabs and sessions
                 localStorage.setItem('team', JSON.stringify(response.team));
-                console.log('💾 AuthContext: Team data stored in localStorage');
-
                 toast.success(`Welcome, ${response.team.team_name}!`);
-                console.log('✅ AuthContext: State updated - isAuthenticated should now be true');
-            } else {
-                console.log('❌ AuthContext: Login failed - no team data or success=false:', response);
             }
-
+            
             return response;
         } catch (err) {
-            console.error('❌ AuthContext: Login error:', err);
             const errorMessage = err instanceof Error ? err.message : 'Login failed';
             setError(errorMessage);
             toast.error(errorMessage);
             throw err;
         } finally {
             setIsLoading(false);
-            console.log('🔄 AuthContext: Login process completed, isLoading set to false');
         }
-    };
-
-    // Logout function
-    const logout = () => {
-        console.log('🚪 AuthContext: Logging out user');
-        setIsAuthenticated(false);
-        setTeam(null);
-        setError(null);
-        localStorage.removeItem('team');
-
-        // The HTTP-only cookie will be handled by the server or expire naturally
-        toast.success('Logged out successfully');
     };
 
     // Clear error function
@@ -181,7 +132,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         team,
         login,
         requestOTP,
-        logout,
         error,
         clearError,
         checkAuthStatus,
