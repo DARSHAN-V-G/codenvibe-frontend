@@ -56,15 +56,6 @@ export function Navigation({ currentPage, onNavigate, isLoggedIn }: NavigationPr
               {page.label}
             </Button>
           ))}
-          
-          {/* Logout */}
-          <Button
-            onClick={() => onNavigate('login')}
-            className="py-2 px-4 border-2 border-red-500 bg-white text-red-500 rounded-lg hover:bg-red-50 transition-colors"
-            style={{ fontFamily: 'Patrick Hand, cursive' }}
-          >
-            Logout
-          </Button>
         </div>
       </div>
     </nav>

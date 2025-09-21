@@ -16,15 +16,10 @@ import Leaderboard from './components/Leaderboard';
 function NavigationWrapper() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const handleNavigate = (page: string) => {
-    if (page === 'login') {
-      logout();
-      navigate('/');
-    } else {
-      navigate(`/${page}`);
-    }
+    navigate(`/${page}`);
   };
 
   const getCurrentPage = () => {
@@ -68,13 +63,8 @@ function CodeEditorWithRouter() {
     return <Navigate to="/questions" replace />;
   }
 
-  // Convert string to number for the CodeEditorPage component
-  const questionIdNumber = parseInt(questionId, 10);
-  if (isNaN(questionIdNumber)) {
-    return <Navigate to="/questions" replace />;
-  }
-
-  return <CodeEditorPage questionId={questionIdNumber} onBack={handleBack} />;
+  // Pass questionId as string directly to match backend _id format
+  return <CodeEditorPage questionId={questionId} onBack={handleBack} />;
 }
 
 // Login component with redirect on success

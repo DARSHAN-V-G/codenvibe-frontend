@@ -184,6 +184,21 @@ export interface ApiError {
     details?: any;
 }
 
+export interface LeaderboardEntry {
+    _id: string;
+    team_name: string;
+    score: number;
+    solved: number;
+    rank: number;
+    year: number;
+}
+
+export interface LeaderboardResponse {
+    success: boolean;
+    leaderboard: LeaderboardEntry[];
+    timestamp: string;
+}
+
 // Authentication API
 export const authApi = {
     // Request login OTP
@@ -218,17 +233,12 @@ export const authApi = {
         }
     },
 
-    // Verify current authentication status
+    // Note: /auth/verify endpoint doesn't exist in backend
+    // This function is kept for future implementation
     verifyAuth: async (): Promise<{ authenticated: boolean; team?: any }> => {
-        try {
-            console.log('🔍 Verifying current authentication status...');
-            const response: AxiosResponse<any> = await apiClient.get('/auth/verify');
-            console.log('✅ Auth verification successful:', response.data);
-            return { authenticated: true, team: response.data.team };
-        } catch (error: any) {
-            console.log('❌ Auth verification failed:', error.response?.status);
-            return { authenticated: false };
-        }
+        // Since the endpoint doesn't exist, we'll return false for now
+        // In the future, implement a proper auth verification endpoint
+        return { authenticated: false };
     },
 };
 
@@ -255,10 +265,58 @@ export const questionApi = {
     // Get specific question by ID
     getQuestionById: async (id: string): Promise<Question> => {
         try {
+            console.log('🔍 API: Fetching question by ID:', id);
+            console.log('🔍 API: Full URL will be:', `${API_BASE_URL}/question/question/${id}`);
+            
             const response: AxiosResponse<Question> = await apiClient.get(`/question/question/${id}`);
-            return response.data;
+            
+            console.log('✅ API: Question response received:', {
+                status: response.status,
+                dataKeys: Object.keys(response.data || {}),
+                hasDescription: !!(response.data as any)?.description,
+                hasTitle: !!(response.data as any)?.title,
+                fullData: response.data
+            });
+            
+            // Check if the data is nested in a wrapper object
+            let questionData = response.data;
+            
+            // Common API response patterns
+            if (questionData && typeof questionData === 'object') {
+                // Check if data is wrapped in a 'question' property
+                if ((questionData as any).question && !(questionData as any).title) {
+                    console.log('🔄 API: Data appears to be wrapped in "question" property');
+                    questionData = (questionData as any).question;
+                }
+                // Check if data is wrapped in a 'data' property
+                else if ((questionData as any).data && !(questionData as any).title) {
+                    console.log('🔄 API: Data appears to be wrapped in "data" property');
+                    questionData = (questionData as any).data;
+                }
+                // Check if it's an array and we need the first element
+                else if (Array.isArray(questionData) && questionData.length > 0) {
+                    console.log('🔄 API: Data appears to be an array, taking first element');
+                    questionData = questionData[0];
+                }
+            }
+            
+            console.log('🏁 API: Final question data:', {
+                hasTitle: !!(questionData as any)?.title,
+                hasDescription: !!(questionData as any)?.description,
+                keys: Object.keys(questionData || {})
+            });
+            
+            return questionData as Question;
         } catch (error: any) {
-            throw new Error(error.response?.data?.error || 'Failed to fetch question');
+            console.error('❌ API: getQuestionById failed:', {
+                id,
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                errorData: error.response?.data,
+                url: error.config?.url,
+                baseURL: error.config?.baseURL
+            });
+            throw new Error(error.response?.data?.error || error.response?.data?.message || 'Failed to fetch question');
         }
     },
 
@@ -335,6 +393,35 @@ export const submissionApi = {
             return response.data;
         } catch (error: any) {
             throw new Error(error.response?.data?.error || 'Failed to submit code');
+        }
+    },
+};
+
+// Leaderboard API
+export const leaderboardApi = {
+    // Get current leaderboard
+    getLeaderboard: async (): Promise<LeaderboardResponse> => {
+        try {
+            console.log('📊 Fetching leaderboard data...');
+            const response: AxiosResponse<LeaderboardResponse> = await apiClient.get('/leaderboard');
+            console.log('✅ Leaderboard data fetched:', response.data);
+            return response.data;
+        } catch (error: any) {
+            console.error('❌ Leaderboard fetch failed:', error.response?.data);
+            throw new Error(error.response?.data?.error || error.response?.data?.message || 'Failed to fetch leaderboard');
+        }
+    },
+
+    // Get leaderboard for specific year
+    getLeaderboardByYear: async (year: number): Promise<LeaderboardResponse> => {
+        try {
+            console.log('📊 Fetching leaderboard data for year:', year);
+            const response: AxiosResponse<LeaderboardResponse> = await apiClient.get(`/leaderboard/${year}`);
+            console.log('✅ Leaderboard data fetched for year:', year, response.data);
+            return response.data;
+        } catch (error: any) {
+            console.error('❌ Leaderboard fetch failed for year:', year, error.response?.data);
+            throw new Error(error.response?.data?.error || error.response?.data?.message || 'Failed to fetch leaderboard');
         }
     },
 };

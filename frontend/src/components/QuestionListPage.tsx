@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
-import { questionApi } from '@/api';
-import { useAuth } from '@/contexts/AuthContext';
+import { questionApi } from '../api';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Question {
   _id: string;
