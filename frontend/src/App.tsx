@@ -31,6 +31,11 @@ function NavigationWrapper() {
     return 'login';
   };
 
+  // Only show navigation on questions page
+  if (location.pathname !== '/questions' && location.pathname !== '/leaderboard') {
+    return null;
+  }
+
   return (
     <Navigation
       currentPage={getCurrentPage()}
@@ -102,6 +107,29 @@ function LoginWithRouter() {
 }
 
 function AppContent() {
+  // Initialize inspect prevention
+  useEffect(() => {
+    // Enable in both development and production for testing
+    import('./utils/preventInspect').then(module => {
+      module.preventInspect();
+      
+      // Add additional listener for devtools
+      const handler = () => {
+        if ((window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+          document.body.innerHTML = 'Developer tools are not allowed.';
+        }
+      };
+      
+      window.addEventListener('load', handler);
+      document.addEventListener('DOMContentLoaded', handler);
+      
+      return () => {
+        window.removeEventListener('load', handler);
+        document.removeEventListener('DOMContentLoaded', handler);
+      };
+    });
+  }, []);
+
   // Add Google Fonts including new animation fonts
   const fontLinks = [
     'https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&display=swap',

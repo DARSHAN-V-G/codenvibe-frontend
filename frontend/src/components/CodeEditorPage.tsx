@@ -73,11 +73,6 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
   }, []);
   const runDiagnostics = async () => {
     
-    // Check authentication cookie
-    const cookieStatus = checkAuthCookie();
-    
-    // Check localStorage
-    const storedTeam = localStorage.getItem('team');
 
     try {
 
@@ -231,6 +226,18 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
     }
   };
 
+  const handleDefaultCode = () => {
+    if (!question?.correct_code) {
+      toast.error('No default code available');
+      return;
+    }
+
+    if (window.confirm('Are you sure you want to reset your code to default? All your changes will be lost.')) {
+      setCode(question.correct_code);
+      toast.success('Code reset to default');
+    }
+  };
+
   const handleRunCode = async () => {
     if (!code.trim()) {
       toast.error('Please write some code before running!');
@@ -286,6 +293,8 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
             style={{ fontFamily: 'Patrick Hand, cursive', fontSize: '1rem', fontWeight: 'bold' }}
           >
             {currentUserRank ? `Rank #${currentUserRank}` : 'Not Ranked'}
+            
+            
           </div>
         </div>
       </div>
@@ -301,7 +310,7 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
           {!question?.description && rawQuestionData?.description && (
             <div className="mb-4 p-3 bg-blue-100 border border-blue-300 rounded">
               <p className="font-bold text-blue-800">🔧 Emergency Fallback (Using Raw Data):</p>
-              <div className="whitespace-pre-line text-gray-800 leading-relaxed mt-2">
+              <div className="whitespace-pre-line text-gray-800 leading-relaxed mt-2 ">
                 {rawQuestionData.description}
               </div>
             </div>
@@ -311,7 +320,7 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
             {(() => {
               if (question?.description) {
                 return (
-                  <div className="whitespace-pre-line text-gray-800 leading-relaxed">
+                  <div className="whitespace-pre-line text-gray-800 leading-relaxed" style={{ fontFamily: 'Patrick Hand, cursive' }}>
                     {question.description}
                   </div>
                 );
@@ -343,12 +352,33 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
           {(question?.incorrect_code || rawQuestionData?.incorrect_code) && (
             <div className="mt-8">
               <h3 className="text-xl font-bold mb-3" style={{ fontFamily: 'Patrick Hand, cursive' }}>
-                Starting Code
+                Sample Test Cases
               </h3>
-              <div className="border-2 border-black rounded-lg p-4 bg-gray-50">
-                <pre className="text-sm font-mono overflow-x-auto whitespace-pre-wrap" style={{ fontFamily: 'Monaco, Consolas, monospace' }}>
-                  {question?.incorrect_code || rawQuestionData?.incorrect_code}
-                </pre>
+              <div className="border-2 border-black rounded-xl p-6 bg-gray-50 space-y-6">
+                {question?.test_cases?.slice(0, 2).map((testCase, index) => (
+                  <div key={index} className="space-y-3">
+                    <div className="font-bold text-gray-700 text-lg px-2">Test Case {index + 1}</div>
+                    <div className="bg-gray-100 p-4 rounded-lg shadow-sm">
+                      <div className="mb-4">
+                        <span className="text-gray-600 font-semibold px-2 mb-2 block">Input:</span>
+                        <pre className="mt-1 text-sm font-mono overflow-x-auto whitespace-pre-wrap bg-white p-3 rounded-lg border border-gray-200">
+                          {testCase.input}
+                        </pre>
+                      </div>
+                      <div>
+                        <span className="text-gray-600 font-semibold px-2 mb-2 block">Expected Output:</span>
+                        <pre className="mt-1 text-sm font-mono overflow-x-auto whitespace-pre-wrap bg-white p-3 rounded-lg border border-gray-200">
+                          {testCase.expectedOutput}
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {question?.test_cases && question.test_cases.length > 2 && (
+                  <div className="text-gray-500 text-sm text-center mt-2">
+                    {question.test_cases.length - 2} more test cases are hidden
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -358,27 +388,29 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
         <div className="w-3/5 flex flex-col">
           <div className="p-6 pb-0 overflow-y-auto">
             <Tabs value={activeTab} onValueChange={(v: string) => setActiveTab(v as 'code' | 'submissions')}>
-              <TabsList className="border-2 border-black rounded-lg bg-white">
+              <TabsList className="flex gap-3 bg-transparent border-none p-1">
                 <TabsTrigger
                   value="code"
-                  className="px-4 py-2 rounded-md border-2 border-transparent flex items-center gap-2 transition-colors data-[state=active]:border-black data-[state=active]:bg-black data-[state=active]:text-white hover:bg-gray-100"
+                  className="border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 w-full"
+                  style={{ fontFamily: 'Patrick Hand, cursive' }}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                     <path d="M9 8l-4 4 4 4" strokeLinecap="round" strokeLinejoin="round" />
                     <path d="M15 8l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  <span>Code Editor</span>
+                  <span className="text-base font-semibold">Code Editor</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="submissions"
-                  className="px-4 py-2 rounded-md border-2 border-transparent flex items-center gap-2 transition-colors data-[state=active]:border-black data-[state=active]:bg-black data-[state=active]:text-white hover:bg-gray-100"
+                  className="border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 w-full"
+                  style={{ fontFamily: 'Patrick Hand, cursive' }}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                     <path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-4" strokeLinecap="round" strokeLinejoin="round"/>
                     <path d="M12 11v6M9 14h6" strokeLinecap="round" strokeLinejoin="round"/>
                     <path d="M9 3l3 3 3-3" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
-                  <span>Submissions</span>
+                  <span className="text-base font-semibold">Submissions</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -407,12 +439,35 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
                         onChange={(value) => setCode(value || '')}
                         theme="vs-dark"
                         loading={<div className="flex items-center justify-center h-full bg-gray-800 text-white">Loading Monaco Editor...</div>}
-                        onMount={(editor) => {
-                          console.log('Monaco Editor mounted successfully');
+                        onMount={(editor, monaco) => {
                           editor.focus();
+
+                          // Handle paste events with a custom message
+                          editor.onDidPaste((e) => {
+                            const messages = [
+                              "Keep the coding vibe alive - no copy-paste shortcuts!"
+                            ];
+                            const newText = messages[Math.floor(Math.random() * messages.length)];
+                            editor.executeEdits('paste-blocker', [{
+                              range: e.range,
+                              text: newText,
+                              forceMoveMarkers: true
+                            }]);
+                          });
+
+                          // Disable undo/redo commands
+                          editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyZ, () => {
+                            toast.error('Undo is not allowed!');
+                          });
+                          editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyY, () => {
+                            toast.error('Redo is not allowed!');
+                          });
+                          editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyZ, () => {
+                            toast.error('Redo is not allowed!');
+                          });
                         }}
                         beforeMount={(_monaco) => {
-                          console.log('Monaco Editor initializing...');
+                          // Initialize Monaco settings
                         }}
                         options={{
                           fontSize: 14,
@@ -425,10 +480,13 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
                           lineNumbers: 'on',
                           renderWhitespace: 'selection',
                           bracketPairColorization: { enabled: true },
-                          suggestOnTriggerCharacters: true,
-                          acceptSuggestionOnEnter: 'on',
-                          tabSize: 4,
-                          insertSpaces: true,
+                          contextmenu: false, // Disable context menu
+                          quickSuggestions: false, // Disable quick suggestions
+                          parameterHints: { enabled: false }, // Disable parameter hints
+                          suggestOnTriggerCharacters: false,
+                          acceptSuggestionOnEnter: 'off',
+                          tabCompletion: 'off',
+                          wordBasedSuggestions: 'off',
                         }}
                       />
                     )}
@@ -477,12 +535,12 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
         </div>
 
         {/* Results List */}
-        <div className="space-y-3">
+        <div className="space-y-3" style={{ fontFamily: 'Patrick Hand, cursive' }}>
           {runResults.visibleResults.map((result, index) => (
             <div
               key={index}
-              className={`w-full border rounded-lg shadow-md ${
-                result.passed ? "border-green-500" : "border-red-500"
+              className={`w-full border-2 rounded-lg shadow-md ${
+                result.passed ? "border-green-400 bg-green-900/10" : "border-red-500 bg-red-900/10"
               }`}
             >
               <div
@@ -543,14 +601,22 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
 )}
 
 
-                  <div className="mt-8 mb-6">
+                  <div className="mt-8 mb-6 flex gap-4">
                     <Button
                       onClick={handleRunCode}
                       disabled={isRunning}
-                      className="w-full py-4 px-8 border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-semibold"
+                      className="flex-1 py-4 px-8 border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-semibold"
                       style={{ fontFamily: 'Patrick Hand, cursive' }}
                     >
                       {isRunning ? 'Running Code...' : 'Run Code'}
+                    </Button>
+                    <Button
+                      onClick={handleDefaultCode}
+                      disabled={isRunning}
+                      className="flex-1 py-4 px-8 border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-semibold"
+                      style={{ fontFamily: 'Patrick Hand, cursive' }}
+                    >
+                      Reset Code
                     </Button>
                   </div>
                 </div>

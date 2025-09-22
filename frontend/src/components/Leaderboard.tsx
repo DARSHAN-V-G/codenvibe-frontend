@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { LeaderboardEntry } from '../api';
 import { useAuth } from '../contexts/AuthContext';
 import { useWebSocket } from '../contexts/WebSocketContext';
 import "./Leaderboard.css";

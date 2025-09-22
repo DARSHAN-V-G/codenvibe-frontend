@@ -80,7 +80,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               className="text-5xl font-bold mb-2"
               style={{ fontFamily: 'Patrick Hand, cursive' }}
             >
-              Vibe n Code
+              Code n Vibe
             </h1>
             <p
               className="text-xl text-gray-600"

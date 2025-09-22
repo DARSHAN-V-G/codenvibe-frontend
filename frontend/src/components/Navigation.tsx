@@ -20,7 +20,7 @@ export function Navigation({ currentPage, onNavigate, isLoggedIn }: NavigationPr
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <motion.div 
-          className="text-2xl font-bold cursor-pointer"
+          className="text-4xl font-bold cursor-pointer"
           style={{ fontFamily: 'Patrick Hand, cursive' }}
           onClick={() => onNavigate('questions')}
           whileHover={{ 
@@ -28,7 +28,7 @@ export function Navigation({ currentPage, onNavigate, isLoggedIn }: NavigationPr
             transition: { duration: 0.2 }
           }}
           animate={{
-            y: [0, -2, 0],
+            y: [0, 0, 0],
           }}
           transition={{
             duration: 4,
@@ -36,24 +36,23 @@ export function Navigation({ currentPage, onNavigate, isLoggedIn }: NavigationPr
             ease: "easeInOut"
           }}
         >
-          Vibe n Code
+          Code n Vibe
         </motion.div>
-
         {/* Navigation Links */}
         <div className="flex items-center gap-4">
           {pages.map((page) => (
             <Button
               key={page.id}
               onClick={() => onNavigate(page.id)}
-              className={`py-2 px-4 border-2 border-black rounded-lg transition-colors ${
-                currentPage === page.id
+              className={`py-2 px-4 border-2 border-black rounded-lg transition-colors flex items-center justify-center ${
+                location.pathname === `/${page.id}`
                   ? 'bg-black text-white'
                   : 'bg-white text-black hover:bg-gray-100'
               }`}
               style={{ fontFamily: 'Patrick Hand, cursive' }}
             >
               <span className="mr-2">{page.icon}</span>
-              {page.label}
+              {page.id}
             </Button>
           ))}
         </div>
