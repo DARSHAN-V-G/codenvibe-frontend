@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Code, Users, CheckCircle, AlertCircle } from 'lucide-react';
-import api from '../utils/api';
+import { Code, Users, CheckCircle, AlertCircle, ArrowRightLeft } from 'lucide-react';
+import api from '../utils/api.ts';
+import toast from 'react-hot-toast';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -9,10 +10,35 @@ export default function Dashboard() {
     questionsWithIssues: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [currentRound, setCurrentRound] = useState(1);
+  const [updatingRound, setUpdatingRound] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
   }, []);
+
+  const handleRoundChange = async () => {
+    if (updatingRound) return;
+
+    try {
+      setUpdatingRound(true);
+      const newRound = currentRound === 1 ? 2 : 1;
+      
+      const response = await api.updateRound(newRound);
+      
+      if (response.success) {
+        setCurrentRound(newRound);
+        toast.success(`Successfully switched to Round ${newRound}`);
+      } else {
+        toast.error(response.error || 'Failed to update round');
+      }
+    } catch (error) {
+      toast.error('Error updating round');
+      console.error('Error updating round:', error);
+    } finally {
+      setUpdatingRound(false);
+    }
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -85,6 +111,37 @@ export default function Dashboard() {
             `${stats.questionsWithIssues} questions need attention` : 
             'All questions are working properly'}
         />
+      </div>
+
+      {/* Round Management */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Round Management</h2>
+        <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-200">
+          <div className="flex items-center">
+            <div className="bg-purple-100 p-3 rounded-full">
+              <ArrowRightLeft className="w-6 h-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <h3 className="font-medium text-purple-900">Current Round: {currentRound}</h3>
+              <p className="text-purple-700 text-sm">Switch between rounds</p>
+            </div>
+          </div>
+          <button
+            onClick={handleRoundChange}
+            disabled={updatingRound}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              updatingRound
+                ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                : 'bg-purple-600 text-white hover:bg-purple-700'
+            }`}
+          >
+            {updatingRound ? (
+              'Updating...'
+            ) : (
+              `Switch to Round ${currentRound === 1 ? '2' : '1'}`
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Quick Actions */}

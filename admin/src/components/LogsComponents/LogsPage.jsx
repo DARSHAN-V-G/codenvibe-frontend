@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Activity, Play, Square, Search } from 'lucide-react';
-import api from '../../utils/api';
+import api from '../../utils/api.ts';
 
 export default function LogsPage() {
   const [logs, setLogs] = useState([]);

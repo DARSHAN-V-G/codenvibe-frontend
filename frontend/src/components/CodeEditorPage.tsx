@@ -283,17 +283,19 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
             className="py-2 px-4 border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100"
             style={{ fontFamily: 'Patrick Hand, cursive' }}
           >
-            ← Back to Challenges
+                          ← Back to Challenges
           </Button>
           <h1 className="text-3xl font-bold" style={{ fontFamily: 'Patrick Hand, cursive' }}>
             {question?.title || rawQuestionData?.title || `Question ${questionId}` || 'Untitled Question'}
           </h1>
-          <div
-            className="border-2 border-black text-black px-4 py-2 rounded-lg bg-white hover:bg-gray-100 transition-colors"
-            style={{ fontFamily: 'Patrick Hand, cursive', fontSize: '1rem', fontWeight: 'bold' }}
-          >
-            {currentUserRank ? `Rank #${currentUserRank}` : 'Not Ranked'}
-            
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => window.location.href = '/leaderboard'}
+              className="h-11 px-4 border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition-colors"
+              style={{ fontFamily: 'Patrick Hand, cursive' }}
+            >
+              → Move to Leaderboards
+            </Button>
             
           </div>
         </div>
@@ -388,32 +390,58 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
         <div className="w-3/5 flex flex-col">
           <div className="p-6 pb-0 overflow-y-auto">
             <Tabs value={activeTab} onValueChange={(v: string) => setActiveTab(v as 'code' | 'submissions')}>
-              <TabsList className="flex gap-3 bg-transparent border-none p-1">
-                <TabsTrigger
-                  value="code"
-                  className="border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 w-full"
-                  style={{ fontFamily: 'Patrick Hand, cursive' }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-                    <path d="M9 8l-4 4 4 4" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M15 8l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span className="text-base font-semibold">Code Editor</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="submissions"
-                  className="border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 w-full"
-                  style={{ fontFamily: 'Patrick Hand, cursive' }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-                    <path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-4" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 11v6M9 14h6" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M9 3l3 3 3-3" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  <span className="text-base font-semibold">Submissions</span>
-                </TabsTrigger>
-              </TabsList>
-
+              <div className='flex items-center justify-between w-full'>
+                <div className="flex-1">
+                  <TabsList className="flex gap-3 bg-transparent border-none p-1">
+                    <TabsTrigger
+                      value="code"
+                      className="border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 w-full"
+                      style={{ fontFamily: 'Patrick Hand, cursive' }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                        <path d="M9 8l-4 4 4 4" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M15 8l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span className="text-base font-semibold">Code Editor</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="submissions"
+                      className="border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 w-full"
+                      style={{ fontFamily: 'Patrick Hand, cursive' }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                        <path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-4" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 11v6M9 14h6" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M9 3l3 3 3-3" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span className="text-base font-semibold">Submissions</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+                <div className="flex justify-end">
+                  <div
+                    className={`h-11 px-4 flex border-2 border-black items-center text-black rounded-lg transition-colors ${
+                      currentUserRank === 1
+                        ? 'bg-yellow-100 hover:bg-yellow-200'
+                        : currentUserRank === 2
+                        ? 'bg-gray-100 hover:bg-gray-200'
+                        : currentUserRank === 3
+                        ? 'bg-amber-100 hover:bg-amber-200'
+                        : 'bg-white hover:bg-gray-100'
+                    }`}
+                    style={{ fontFamily: 'Patrick Hand, cursive', fontSize: '1rem', fontWeight: 'bold' }}
+                  >
+                    {currentUserRank ? (
+                      <>
+                        
+                        Rank {currentUserRank === 1 ? '🥇 ' :
+                         currentUserRank === 2 ? '🥈 ' :
+                         currentUserRank === 3 ? '🥉 ' : `#${currentUserRank}`}
+                      </>
+                    ) : 'Not Ranked'}
+                  </div>
+                </div>
+              </div>
               <TabsContent value="code" className="mt-4">
                 <div className="p-2">
                   <Label className="text-lg font-bold mb-4 block" style={{ fontFamily: 'Patrick Hand, cursive' }}>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Users, Mail } from 'lucide-react';
-import api from '../../utils/api';
+import api from '../../utils/api.ts';
 import TeamForm from './TeamForm';
 
 export default function TeamsList() {

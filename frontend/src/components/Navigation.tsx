@@ -11,8 +11,10 @@ export function Navigation({ currentPage, onNavigate, isLoggedIn }: NavigationPr
   if (!isLoggedIn) return null;
 
   const pages = [
+        { id: 'rules', label: 'Rules', icon: '📋' },
     { id: 'questions', label: 'Challenges', icon: '🧩' },
     { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
+    { id: 'round2', label: 'Round 2', icon: '🚀' },
   ];
 
   return (
@@ -52,7 +54,7 @@ export function Navigation({ currentPage, onNavigate, isLoggedIn }: NavigationPr
               style={{ fontFamily: 'Patrick Hand, cursive' }}
             >
               <span className="mr-2">{page.icon}</span>
-              {page.id}
+              {page.label}
             </Button>
           ))}
         </div>

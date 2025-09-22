@@ -19,6 +19,7 @@ export default function Layout({ children }) {
     { to: '/questions', icon: Code, label: 'Questions' },
     { to: '/teams', icon: Users, label: 'Teams' },
     { to: '/logs', icon: Activity, label: 'Server Logs' },
+    { to: '/round2', icon: Code, label: 'Round 2' },
   ];
 
   const NavItem = ({ to, icon: Icon, label, mobile = false }) => (

@@ -46,3 +46,27 @@ export interface AuthData {
   password: string;
   email?: string;
 }
+
+// Round 2 Question types
+export interface Round2QuestionData {
+  _id?: string;
+  description: string;
+}
+
+export interface Round2SubmissionTeam {
+  _id: string;
+  team_name: string;
+  roll_nos: string[];
+  members: string[];
+}
+
+export interface Round2Submission {
+  _id: string;
+  image_url: string[];
+  github_link: string[];
+  prompt_statements: string;
+  tech_stack_used: string;
+  team: Round2SubmissionTeam;
+  createdAt: string;
+  updatedAt: string;
+}

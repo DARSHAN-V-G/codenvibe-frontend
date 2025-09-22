@@ -8,6 +8,7 @@ interface Question {
   title: string;
   description: string;
   completed: boolean;
+  solved: boolean;
 }
 
 interface QuestionListPageProps {
@@ -28,7 +29,8 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
       const questionsData = await questionApi.getQuestions();
       const questionsWithDefaults = questionsData.map(q => ({
         ...q,
-        completed: false
+        completed: false,
+        solved: q.solved
       }));
       setQuestions(questionsWithDefaults);
     } catch (err) {
@@ -93,7 +95,7 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
               key={question._id}
               className="bg-white rounded-xl border-2 border-black p-6 shadow-lg hover:shadow-xl transition-shadow relative"
             >
-              {question.completed && (
+              {question.solved && (
                 <div className="absolute top-4 right-4">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm">✓</span>
@@ -115,7 +117,7 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
                 onClick={() => onSelectQuestion(question._id)}
                 className="w-full py-3 px-6 border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition-colors font-main"
               >
-                {question.completed ? 'View Solution' : 'Start Challenge'}
+                {'Start Challenge'}
               </Button>
             </div>
           ))}

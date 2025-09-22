@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Code } from 'lucide-react';
-import api from '../../utils/api';
+import api from '../../utils/api.ts';
 import QuestionForm from './QuestionForm';
 
 export default function QuestionsList() {

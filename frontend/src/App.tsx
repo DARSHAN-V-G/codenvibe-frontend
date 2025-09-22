@@ -12,6 +12,9 @@ import { SparkleOverlay } from './components/SparkleOverlay';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 import Leaderboard from './components/Leaderboard';
+import { Rules } from './components/Rules';
+import { Round2 } from './components/Round2';
+import { Submission } from './components/Submission';
 
 // Component to handle navigation logic
 function NavigationWrapper() {
@@ -27,12 +30,13 @@ function NavigationWrapper() {
     const path = location.pathname;
     if (path === '/' || path === '/login') return 'login';
     if (path === '/questions') return 'questions';
+    if (path === '/rules') return 'rules';
     if (path.startsWith('/editor')) return 'editor';
     return 'login';
   };
 
   // Only show navigation on questions page
-  if (location.pathname !== '/questions' && location.pathname !== '/leaderboard') {
+  if (location.pathname !== '/questions' && location.pathname !== '/leaderboard' && location.pathname !== '/rules') {
     return null;
   }
 
@@ -82,7 +86,7 @@ function LoginWithRouter() {
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       setTimeout(() => {
-        navigate('/questions', { replace: true });
+        navigate('/rules', { replace: true });
       }, 50);
     }
   }, [isAuthenticated, isLoading, navigate]);
@@ -114,19 +118,7 @@ function AppContent() {
       module.preventInspect();
       
       // Add additional listener for devtools
-      const handler = () => {
-        if ((window as any).__REACT_DEVTOOLS_GLOBAL_HOOK__) {
-          document.body.innerHTML = 'Developer tools are not allowed.';
-        }
-      };
-      
-      window.addEventListener('load', handler);
-      document.addEventListener('DOMContentLoaded', handler);
-      
-      return () => {
-        window.removeEventListener('load', handler);
-        document.removeEventListener('DOMContentLoaded', handler);
-      };
+
     });
   }, []);
 
@@ -226,6 +218,54 @@ function AppContent() {
                     variants={pageVariants}
                   >
                     <CodeEditorWithRouter />
+                  </motion.div>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rules"
+              element={
+                <ProtectedRoute>
+                  <motion.div
+                    key="rules"
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                  >
+                    <Rules />
+                  </motion.div>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/round2"
+              element={
+                <ProtectedRoute>
+                  <motion.div
+                    key="round2"
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                  >
+                    <Round2 />
+                  </motion.div>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/submit/:questionId"
+              element={
+                <ProtectedRoute>
+                  <motion.div
+                    key="submission"
+                    initial="initial"
+                    animate="in"
+                    exit="out"
+                    variants={pageVariants}
+                  >
+                    <Submission />
                   </motion.div>
                 </ProtectedRoute>
               }

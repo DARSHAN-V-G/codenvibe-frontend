@@ -11,41 +11,80 @@ const apiClient = axios.create({
     withCredentials: true, // Important for JWT cookies
 });
 
-// Request interceptor for logging
-apiClient.interceptors.request.use((config) => {
-
-
-    if (typeof document !== 'undefined') {
-
-        const cookies = document.cookie.split(';').map(c => c.trim());
-        const authCookie = cookies.find(c => c.startsWith('codenvibe_token='));
-
-        // Check withCredentials status silently
-    }
-
-    return config;
-});
-
 // Response interceptor to handle errors and logging
 apiClient.interceptors.response.use(
     (response) => {
-
-
         // Enhanced cookie handling for login responses
         if (response.config.url?.includes('login') || response.config.url?.includes('verify')) {
             document.cookie.split(';').map(c => c.trim());
         }
-
         return response;
     },
     (error) => {
-
         if (error.response?.status === 401) {
             // Cookie expired or invalid - the browser will handle cookie removal
         }
         return Promise.reject(error);
     }
 );
+
+// Types
+export interface Round2Question {
+    _id: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface SubmissionResponse {
+    success: boolean;
+    error?: string;
+}
+
+export interface SubmissionCheckResponse {
+    exists: boolean;
+    submission?: {
+        _id: string;
+    };
+    error?: string;
+}
+
+// Round 2 API functions
+export const round2Api = {
+    // Get all Round 2 questions
+    getQuestions: async (): Promise<{ success: boolean; questions: Round2Question[]; error?: string }> => {
+        try {
+            const response = await apiClient.get('/question/round2');
+            return response.data;
+        } catch (error) {
+            throw new Error('Error loading Round 2 questions');
+        }
+    },
+
+    // Check if submission exists
+    checkSubmission: async (questionId: string): Promise<SubmissionCheckResponse> => {
+        try {
+            const response = await apiClient.get(`/round2/checksubmission/${questionId}`);
+            return response.data;
+        } catch (error) {
+            throw new Error('Failed to check submission status');
+        }
+    },
+
+    // Submit Round 2 solution
+    submit: async (formData: FormData): Promise<SubmissionResponse> => {
+        try {
+            const response = await apiClient.post('/round2/submit', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            return response.data;
+        } catch (error) {
+            throw new Error('Error submitting solution');
+        }
+    }
+};
 
 export interface AuthResponse {
     success: boolean;
@@ -78,6 +117,7 @@ export interface QuestionListItem {
     _id: string;
     title: string;
     description: string;
+    solved: boolean;
 }
 
 export interface SubmissionResponse {

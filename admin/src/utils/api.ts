@@ -1,9 +1,16 @@
 import axios from 'axios';
 import type { AxiosInstance } from 'axios';
-import type { ApiResponse, QuestionData, TeamData, AuthData } from '../types/api';
+import type { 
+  ApiResponse, 
+  QuestionData, 
+  TeamData, 
+  AuthData, 
+  Round2QuestionData,
+  Round2Submission 
+} from '../types/api';
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_BASE_API_URL ,
+  baseURL: import.meta.env.VITE_BASE_API_URL,
   timeout: 30000,
   withCredentials: true,
 }) as AxiosInstance;
@@ -66,8 +73,21 @@ const api = {
       API.put('/admin/update-team', { team_name: teamName, ...teamData }),
     
     getLogs: (): Promise<ApiResponse> => 
-      API.get('/admin/logs')
-  
+      API.get('/admin/logs'),
+    
+    // Round 2 Question APIs
+    getAllRound2Questions: (): Promise<ApiResponse<Round2QuestionData[]>> => 
+      API.get('/admin/getround2-questions'),
+    
+    addRound2Question: (description: string): Promise<ApiResponse<Round2QuestionData>> => 
+      API.post('/admin/round2-question', { description }),
+
+    getRound2Submissions: (questionId: string): Promise<ApiResponse<Round2Submission[]>> =>
+      API.get(`/admin/getround2-submission/${questionId}`),
+      
+    // Round Management
+    updateRound: (round: number): Promise<ApiResponse> =>
+      API.post('/admin/update-round', { round })
 };
 
 export default api;
