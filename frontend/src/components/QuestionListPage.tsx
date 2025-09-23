@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { questionApi } from '../api';
 import { useAuth } from '../contexts/AuthContext';
+import { Round2 } from './Round2';
 
 interface Question {
   _id: string;
@@ -22,12 +23,20 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
+  const [isRound1Active, setIsRound1Active] = useState(true);
+
   const fetchQuestions = async () => {
     try {
       setLoading(true);
       setError(null);
-      const questionsData = await questionApi.getQuestions();
-      const questionsWithDefaults = questionsData.map(q => ({
+      const response = await questionApi.getQuestions();
+      
+      if (typeof response === 'string' && response === "Round 1 is not currently active") {
+        setIsRound1Active(false);
+        return;
+      }
+
+      const questionsWithDefaults = (response as Question[]).map((q: Question) => ({
         ...q,
         completed: false,
         solved: q.solved
@@ -61,6 +70,10 @@ export function QuestionListPage({ onSelectQuestion }: QuestionListPageProps) {
         <p style={styles.loadingText}>Please log in to view questions.</p>
       </div>
     );
+  }
+
+  if (!isRound1Active) {
+    return <Round2 />;
   }
 
   if (error) {

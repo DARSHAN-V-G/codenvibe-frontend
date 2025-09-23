@@ -6,7 +6,7 @@ A comprehensive full-stack application for code debugging and question managemen
 
 This repository contains two main applications:
 
-### 📱 Frontend (User Interface)
+### Frontend (User Interface)
 **Location**: `/frontend/`
 
 - **Technology**: React + TypeScript + Vite

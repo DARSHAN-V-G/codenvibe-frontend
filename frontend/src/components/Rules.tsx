@@ -13,7 +13,7 @@ export function Rules() {
             className="text-6xl font-bold text-black mb-4"
             style={{ fontFamily: 'Patrick Hand, cursive' }}
           >
-            📋 Game Rules
+          Game Rules
           </h1>
           <p 
             className="text-xl text-gray-600"
@@ -36,7 +36,7 @@ export function Rules() {
             <div className="space-y-6">
               <div className="space-y-2">
                 <h3 className="text-2xl font-semibold text-blue-600">
-                  🎯 Objective
+                  Objective
                 </h3>
                 <p className="text-lg text-gray-700">
                   Debug each challenge to perfection! Your score depends on your efficiency and accuracy in fixing the code.
@@ -45,7 +45,7 @@ export function Rules() {
 
               <div className="space-y-2">
                 <h3 className="text-2xl font-semibold text-green-600">
-                  📊 Score Calculation
+                  Score Calculation
                 </h3>
                 <ul className="list-disc list-inside text-lg text-gray-700 space-y-2">
                   <li>Each successful debug adds to your score</li>
@@ -83,7 +83,7 @@ export function Rules() {
                   className="py-4 px-8 text-xl border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition-colors"
                   style={{ fontFamily: 'Patrick Hand, cursive' }}
                 >
-                  🚀 Start Coding Now!
+                  Start Coding Now!
                 </Button>
               </div>
             </div>

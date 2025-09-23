@@ -31,6 +31,7 @@ apiClient.interceptors.response.use(
 // Types
 export interface Round2Question {
     _id: string;
+    title: string;
     description: string;
     createdAt: string;
     updatedAt: string;
@@ -46,6 +47,12 @@ export interface SubmissionCheckResponse {
     submission?: {
         _id: string;
     };
+    error?: string;
+}
+
+export interface CurrentRoundResponse {
+    success: boolean;
+    current_round?: number;
     error?: string;
 }
 
@@ -181,6 +188,7 @@ export interface LeaderboardResponse {
     leaderboard: LeaderboardEntry[];
     timestamp: string;
 }
+
 
 // Authentication API
 export const authApi = {
@@ -393,8 +401,16 @@ export const adminApi = {
         } catch (error: any) {
             throw new Error(error.response?.data?.error || 'Failed to register admin');
         }
+        
     },
-
+getCurrentRound: async (): Promise<CurrentRoundResponse> => {
+        try {
+            const response: AxiosResponse<CurrentRoundResponse> = await apiClient.get('/current-round');
+            return response.data;
+        } catch (error: any) {
+            throw new Error(error.response?.data?.error || 'Failed to get current round');
+        }
+    },
     // Login admin account
     login: async (username: string, password: string): Promise<AdminResponse> => {
         try {

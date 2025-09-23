@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { adminApi } from './api';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import { LoginPage } from './components/LoginPage';
 import { QuestionListPage } from './components/QuestionListPage';
@@ -15,6 +16,43 @@ import Leaderboard from './components/Leaderboard';
 import { Rules } from './components/Rules';
 import { Round2 } from './components/Round2';
 import { Submission } from './components/Submission';
+
+// Component to handle round-based routing
+function RoundBasedRoute() {
+  const navigate = useNavigate();
+  const [currentRound, setCurrentRound] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCurrentRound = async () => {
+      try {
+        const response = await adminApi.getCurrentRound();
+        if (response.success && response.current_round) {
+          setCurrentRound(response.current_round);
+        }
+      } catch (error) {
+        console.error('Error fetching current round:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurrentRound();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-black mx-auto mb-4"></div>
+          <p className="text-black font-main">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return currentRound === 1 ? <QuestionListPage onSelectQuestion={(id) => navigate(`/editor/${id}`)} /> : <Round2 />;
+}
 
 // Component to handle navigation logic
 function NavigationWrapper() {
@@ -52,12 +90,44 @@ function NavigationWrapper() {
 // Component for the question list with router integration
 function QuestionListWithRouter() {
   const navigate = useNavigate();
+  const [currentRound, setCurrentRound] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const handleSelectQuestion = (questionId: string) => {
     navigate(`/editor/${questionId}`);
   };
 
-  return <QuestionListPage onSelectQuestion={handleSelectQuestion} />;
+  useEffect(() => {
+    const fetchCurrentRound = async () => {
+      try {
+        const response = await adminApi.getCurrentRound();
+        if (response.success && response.current_round) {
+          setCurrentRound(response.current_round);
+        }
+      } catch (error) {
+        console.error('Error fetching current round:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurrentRound();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-black mx-auto mb-4"></div>
+          <p className="text-black font-main">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return currentRound === 1 ? 
+    <QuestionListPage onSelectQuestion={handleSelectQuestion} /> : 
+    <Round2 />;
 }
 
 // Component for the code editor with router integration
