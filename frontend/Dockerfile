@@ -14,7 +14,7 @@ COPY . .
 
 # Add build argument for API URL
 ARG VITE_BASE_API_URL
-ENV VITE_BASE_API_URL=$VITE_BASE_API_URL
+ENV VITE_BACKEND_URL=$VITE_BASE_API_URL
 
 # Build the application
 RUN npm run build
