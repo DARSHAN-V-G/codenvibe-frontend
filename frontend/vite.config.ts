@@ -50,8 +50,13 @@ export default defineConfig({
     },
   },
   build: {
-    target: 'esnext',
-    outDir: 'build',
+    outDir: 'dist',
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
   server: {
     open: true,
