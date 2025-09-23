@@ -46,11 +46,7 @@ export function Round2() {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      <Navigation
-        currentPage="questions"
-        onNavigate={(page) => navigate(`/${page}`)}
-        isLoggedIn={true}
-      />
+     
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-50 pointer-events-none" />
       <div className="relative p-8">
         <div className="max-w-7xl mx-auto">
@@ -63,7 +59,6 @@ export function Round2() {
             </p>
             <div className="max-w-xl mx-auto mb-12">
               <Progress value={60} className="h-2" />
-              <p className="text-sm text-gray-500 mt-2 font-main">Round 2 progress: 60%</p>
             </div>
           </div>
 

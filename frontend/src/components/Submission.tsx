@@ -148,13 +148,13 @@ export function Submission() {
 
   if (submissionState.exists) {
     return (
-      <div className="min-h-screen bg-white p-8">
+      <div className="min-h-screen bg-white">
         <Navigation
           currentPage="questions"
           onNavigate={(page) => navigate(`/${page}`)}
           isLoggedIn
         />
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="max-w-7xl mx-auto px-8 py-6 text-center">
           <h1 className="text-6xl font-bold text-black mb-4 font-main">
             Already Submitted
           </h1>
@@ -171,14 +171,14 @@ export function Submission() {
 
   /* ---------- MAIN FORM ---------- */
   return (
-    <div className="min-h-screen bg-white p-8">
+    <div className="min-h-screen bg-white">
       <Navigation
         currentPage="questions"
         onNavigate={(page) => navigate(`/${page}`)}
         isLoggedIn
       />
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-8 py-6">
         <div className="text-center mb-12">
           <h1 className="text-6xl font-bold text-black mb-4 font-main">
             Submit Your Solution
