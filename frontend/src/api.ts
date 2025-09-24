@@ -195,7 +195,7 @@ export const authApi = {
     // Request login OTP
     requestLogin: async (email: string): Promise<AuthResponse> => {
         try {
-            const response: AxiosResponse<AuthResponse> = await apiClient.post('/auth/request-login', {
+            const response: AxiosResponse<AuthResponse> = await axios.post('https://ghcc.psgtech.ac.in/backend/githeist/auth/request-login', {
                 email,
             });
             return response.data;
