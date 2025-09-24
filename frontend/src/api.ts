@@ -353,6 +353,7 @@ export const submissionApi = {
 // WebSocket setup for real-time leaderboard updates
 export const setupLeaderboardWebSocket = (onUpdate: (data: LeaderboardEntry[]) => void) => {
     const wsUrl = API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://');
+    //const wsUrl = "wss://ghcc.psgtech.ac.in/backend/githeist/";
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {};
@@ -366,7 +367,7 @@ export const setupLeaderboardWebSocket = (onUpdate: (data: LeaderboardEntry[]) =
                 const leaderboardData = message.teams.map((team: any) => ({
                     _id: team._id || '',
                     team_name: team.team_name,
-                    score: team.score || 0,
+                    score: team.score ? Math.round(Number(team.score) * 100) / 100 : 0,
                     testcases_passed: team.testcases_passed || [],
                     year: team.year || 0,
                     // Calculate solved count if testcases_passed exists

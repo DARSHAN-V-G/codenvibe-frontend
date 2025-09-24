@@ -189,167 +189,178 @@ export function Submission() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="bg-white rounded-xl border-2 border-[#5aa4f6]/30 p-8 shadow-lg">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column */}
-              <div className="space-y-6">
-                {/* Prompt Statements */}
-                <div className="space-y-2">
-                  <Label htmlFor="prompt_statements" className="text-lg font-main">
-                    Prompt Statements
-                  </Label>
-                  <Textarea
-                    id="prompt_statements"
-                    value={promptStatements}
-                    onChange={(e) => setPromptStatements(e.target.value)}
-                    placeholder="Enter your prompt statements"
-                    className="min-h-[8rem] border-[#5aa4f6]/30 focus:border-[#5aa4f6] focus:ring-[#5aa4f6] bg-white font-main"
-                    required
-                  />
-                  <div className="text-sm text-gray-500 text-right font-main">
-                    {promptStatements.length}/500 characters
-                  </div>
-                </div>
+  <div className="bg-white rounded-xl border-2 border-[#5aa4f6]/30 p-8 shadow-lg">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      {/* Left Column */}
+      <div className="flex flex-col gap-8 mb-4">
+        {/* Prompt Statements */}
+        <div className="space-y-4 mb-4">
+          <Label htmlFor="prompt_statements" className="text-lg font-main">
+            Prompt Statements
+          </Label>
+          <Textarea
+            id="prompt_statements"
+            value={promptStatements}
+            onChange={(e) => setPromptStatements(e.target.value)}
+            placeholder="Enter your prompt statements. Use Enter for new paragraphs."
+            className="min-[10rem] border-[#5aa4f6]/30 focus:border-[#5aa4f6] focus:ring-[#5aa4f6] bg-white font-main"
+            required
+          />
 
-                {/* Tech Stack */}
-                <div className="space-y-2">
-                  <Label htmlFor="tech_stack" className="text-lg font-main">
-                    Tech Stack
-                  </Label>
-                  <Textarea
-                    id="tech_stack"
-                    value={techStack}
-                    onChange={(e) => setTechStack(e.target.value)}
-                    placeholder="List the technologies used"
-                    className="min-h-[6rem] border-[#5aa4f6]/30 focus:border-[#5aa4f6] focus:ring-[#5aa4f6] bg-white font-main"
-                    required
-                  />
-                  <div className="text-sm text-gray-500 text-right font-main">
-                    {techStack.length}/200 characters
-                  </div>
-                </div>
+          <div className="text-sm text-gray-500 text-right font-main">
+            {promptStatements.length}/500 characters
+          </div>
+        </div>
 
-                {/* GitHub Links */}
-                <div className="space-y-4">
-                  <Label className="text-lg font-main">GitHub Links</Label>
-                  {githubLinks.map((link, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Input
-                        type="url"
-                        value={link}
-                        onChange={(e) => updateGithubLink(index, e.target.value)}
-                        placeholder="GitHub repository link"
-                        className="flex-1 border-[#5aa4f6]/30 focus:border-[#5aa4f6] focus:ring-[#5aa4f6] bg-white font-main"
-                        required={index === 0}
-                      />
-                      {index > 0 && (
-                        <Button
-                          type="button"
-                          onClick={() => removeGithubLink(index)}
-                          className="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 font-main"
-                        >
-                          Remove
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  {githubLinks.length < 5 && (
-                    <Button
-                      type="button"
-                      onClick={addGithubLink}
-                      className="bg-white text-[#5aa4f6] border-2 border-[#5aa4f6]/30 hover:bg-[#5aa4f6]/5 font-main"
-                    >
-                      Add Another Link
-                    </Button>
-                  )}
-                </div>
+        {/* Tech Stack */}
+        <div className="space-y-2">
+          <Label htmlFor="tech_stack" className="text-lg font-main">
+            Tech Stack
+          </Label>
+          <Textarea
+            id="tech_stack"
+            value={techStack}
+            onChange={(e) => setTechStack(e.target.value)}
+            placeholder="List the technologies used"
+            className="min-[10rem] border-[#5aa4f6]/30 focus:border-[#5aa4f6] focus:ring-[#5aa4f6] bg-white font-main"
+            required
+          />
+          <div className="text-sm text-gray-500 text-right font-main">
+            {techStack.length}/200 characters
+          </div>
+        </div>
+      </div>
 
-                {/* Demo Video */}
-                <div className="space-y-2">
-                  <Label htmlFor="video_url" className="text-lg font-main">
-                    🎥 Demo Video
-                  </Label>
-                  <Input
-                    id="video_url"
-                    type="url"
-                    value={videoUrl}
-                    onChange={(e) => setVideoUrl(e.target.value)}
-                    placeholder="Enter your demo video URL"
-                    className="border-[#5aa4f6]/30 focus:border-[#5aa4f6] focus:ring-[#5aa4f6] bg-white font-main"
-                  />
-                  <p className="text-sm text-gray-500 font-main">
-                    Upload your demo video to a platform (YouTube, Drive) and paste the link here.
-                  </p>
-                </div>
+      {/* Right Column */}
+      <div className="flex flex-col gap-8">
+        {/* GitHub Links */}
+        <div className="space-y-2 mb-4">
+          <Label className="text-lg font-main">GitHub Links</Label>
+          <div className="flex flex-col gap-2">
+            {githubLinks.map((link, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  type="url"
+                  value={link}
+                  onChange={(e) => updateGithubLink(index, e.target.value)}
+                  placeholder="GitHub repository link"
+                  className="flex-1 border-[#5aa4f6]/30 focus:border-[#5aa4f6] focus:ring-[#5aa4f6] bg-white font-main"
+                  required={index === 0}
+                />
+                {index > 0 && (
+                  <Button
+                    type="button"
+                    onClick={() => removeGithubLink(index)}
+                    className="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 font-main"
+                  >
+                    Remove
+                  </Button>
+                )}
               </div>
-
-              {/* Right Column - Images */}
-              <div className="space-y-4">
-                <Label className="text-lg font-main">Screenshots & Images</Label>
-                <div className="border-2 border-dashed border-[#5aa4f6]/30 rounded-xl p-6 bg-[#5aa4f6]/5">
-                  <div className="grid grid-cols-2 gap-4">
-                    {previewUrls.map((url, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={url}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-48 object-cover rounded-lg border border-[#5aa4f6]/30"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-700 rounded-full w-6 h-6 flex items-center justify-center shadow-lg border border-gray-200"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                    {selectedImages.length < 10 && (
-                      <label className="border-2 border-[#5aa4f6]/30 rounded-lg h-48 flex flex-col items-center justify-center cursor-pointer hover:bg-[#5aa4f6]/10 transition-colors">
-                        <div className="text-center space-y-2">
-                          <div className="w-12 h-12 rounded-full bg-[#5aa4f6]/10 flex items-center justify-center mx-auto">
-                            <span className="text-2xl text-[#5aa4f6]">+</span>
-                          </div>
-                          <span className="text-sm font-main text-gray-600">Add Screenshots</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={handleImageChange}
-                            className="hidden"
-                          />
-                        </div>
-                      </label>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-500 mt-4 font-main">
-                    Drop your screenshots here or click to upload (max 10 images)
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex justify-end space-x-4 mt-8">
+            ))}
+            {githubLinks.length < 5 && (
               <Button
                 type="button"
-                onClick={() => navigate('/round2')}
-                className="px-6 py-3 bg-white text-gray-600 rounded-lg hover:bg-gray-50 font-main border border-gray-200"
+                onClick={addGithubLink}
+                className="bg-white text-[#5aa4f6] border-2 border-[#5aa4f6]/30 hover:bg-[#5aa4f6]/5 font-main"
               >
-                Cancel
+                Add Another Link
               </Button>
-              <Button
-  type="submit"
-  disabled={submitting}
-  className="px-6 py-3 bg-white text-gray-600 rounded-lg hover:bg-gray-50 font-main border border-gray-200"
-              >
-  {submitting ? 'Submitting...' : 'Submit Solution'}
-</Button>
-
-
-            </div>
+            )}
           </div>
-        </form>
+        </div>
+
+        {/* Demo Video */}
+        <div className="space-y-4 mb-4">
+          <Label htmlFor="video_url" className="text-lg font-main">
+            Demo Video
+          </Label>
+          <Input
+            id="video_url"
+            type="url"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            placeholder="Enter your demo video URL"
+            className="border-[#5aa4f6]/30 focus:border-[#5aa4f6] focus:ring-[#5aa4f6] bg-white font-main"
+          />
+          <p className="text-sm text-gray-500 font-main">
+            Upload your demo video to a platform (YouTube, Drive) and paste the link here.
+          </p>
+        </div>
+
+        {/* Screenshots & Images */}
+        <div className="space-y-2">
+          <Label className="text-lg font-main">Screenshots & Images</Label>
+          <div className="border-2 border-dashed border-[#5aa4f6]/40 rounded-xl p-6 bg-[#f9fbff]">
+  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {previewUrls.map((url, index) => (
+      <div
+        key={index}
+        className="relative group rounded-xl overflow-hidden shadow-md border border-[#5aa4f6]/30"
+      >
+        <img
+          src={url}
+          alt={`Preview ${index + 1}`}
+          className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        {/* Delete Button Overlay */}
+        <button
+          type="button"
+          onClick={() => removeImage(index)}
+          className="absolute top-2 right-2 bg-red-500/90 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          ×
+        </button>
+      </div>
+    ))}
+
+    {/* Upload Box */}
+    {selectedImages.length < 10 && (
+      <label className="flex flex-col items-center justify-center h-40 rounded-xl border-2 border-dashed border-[#5aa4f6]/40 bg-white hover:border-[#5aa4f6] hover:bg-[#5aa4f6]/10 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md">
+        <div className="flex flex-col items-center space-y-2">
+          <div className="w-12 h-12 rounded-full bg-[#5aa4f6]/10 flex items-center">
+            <span className="text-3xl text-[#5aa4f6]">+</span>
+          </div>
+          <span className="text-sm font-main text-gray-600">Add Screenshot</span>
+        </div>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImageChange}
+          className="hidden"
+        />
+      </label>
+    )}
+  </div>
+  <p className="text-xs text-gray-500 mt-3 font-main text-center">
+    You can upload up to 10 screenshots.
+  </p>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    {/* Buttons */}
+    <div className="flex flex-col sm:flex-row justify-end gap-4 mt-10">
+      <Button
+        type="button"
+        onClick={() => navigate('/round2')}
+        className="px-6 py-3 bg-white text-gray-600 rounded-lg hover:bg-gray-50 font-main border border-gray-200"
+      >
+        Cancel
+      </Button>
+      <Button
+        type="submit"
+        disabled={submitting}
+        className="px-6 py-3 bg-white text-gray-600 rounded-lg hover:bg-gray-50 font-main border border-gray-200"
+      >
+        {submitting ? 'Submitting...' : 'Submit Solution'}
+      </Button>
+    </div>
+  </div>
+</form>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import { questionApi, submissionApi, Question, checkAuthCookie } from '../api';
 import toast from 'react-hot-toast';
 import Editor from '@monaco-editor/react';
 import { useWebSocket } from '../contexts/WebSocketContext';
-
+import { useNavigate } from 'react-router-dom';
 interface CodeEditorPageProps {
   questionId: string;  // Changed from number to string to match backend _id
   onBack: () => void;
@@ -29,6 +29,7 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState<string>('');
   const [output, setOutput] = useState<string>('');
+  const navigate = useNavigate();
   const [runResults, setRunResults] = useState<{
     title: string;
     passedCount: number;
@@ -65,6 +66,12 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
         console.error('❌ Monaco Editor failed to load:', error);
         setMonacoError(true);
         toast.error('Code editor failed to load, using fallback editor');
+      }
+      if (error.message.includes('Round 1 is not currently active')) {
+        console.error('❌ Monaco Editor failed to load:', error);
+        setMonacoError(true);
+        toast.error('Code editor failed to load, using fallback editor');
+        navigate('/questions');
       }
     };
 
@@ -557,9 +564,11 @@ export function CodeEditorPage({ questionId, onBack }: CodeEditorPageProps) {
           <div className="text-green-400">
             Testcases Passed: {runResults.passedCount}/{runResults.totalTests}
           </div>
-          <div className="text-blue-400">
-            New Score: {runResults.newScore}
-          </div>
+          {runResults.newScore !== 0 && (
+            <div className="text-blue-400">
+              New Score: {runResults.newScore}
+            </div>
+          )}
         </div>
 
         {/* Results List */}

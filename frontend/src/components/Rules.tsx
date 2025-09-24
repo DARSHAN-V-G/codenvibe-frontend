@@ -58,7 +58,7 @@ export function Rules() {
 
               <div className="space-y-2">
                 <h3 className="text-2xl font-semibold text-purple-600">
-                  ⚡ Pro Tips
+                  Pro Tips
                 </h3>
                 <ul className="list-disc list-inside text-lg text-gray-700 space-y-2">
                   <li>Test your solution thoroughly before submitting</li>
@@ -78,13 +78,13 @@ export function Rules() {
 
               {/* Start Coding Button */}
               <div className="mt-12 text-center">
-                <Button
-                  onClick={() => navigate('/questions')}
-                  className="py-4 px-8 text-xl border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition-colors"
-                  style={{ fontFamily: 'Patrick Hand, cursive' }}
-                >
-                  Start Coding Now!
-                </Button>
+              <Button
+                onClick={() => navigate('/questions')}
+                className="p-6 text-xl border-2 border-black bg-white text-black rounded-lg hover:bg-gray-100 transition-colors"
+                style={{ fontFamily: 'Patrick Hand, cursive' }}
+              >
+                Start Coding Now!
+              </Button>
               </div>
             </div>
           </div>

@@ -7,8 +7,8 @@ import Dashboard from './components/Dashboard';
 import QuestionsList from './components/Questions/QuestionsList';
 import TeamsList from './components/Teams/TeamsList';
 import LogsPage from './components/LogsComponents/LogsPage';
-
-
+import Round2Submissions from './components/Round2/Round2Submissions';
+import Round2List from './components/Round2/Round2List';
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
@@ -66,7 +66,30 @@ function AppRoutes() {
               </Layout>
             </ProtectedRoute>
           }
+          
         />
+        
+                <Route
+          path="/round2"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Round2List />
+                
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+  path="/round2/submissions/:questionId"
+  element={
+    <ProtectedRoute>
+      <Layout>
+        <Round2Submissions />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
         <Route
           path="/logs"
           element={
